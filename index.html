@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第八回旅館甲子園 | RYOKAN KOSHIEN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Shippori+Mincho:wght@400;700;800&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #0D1F3C;
+  --gold:   #C9A84C;
+  --gold2:  #E8C96D;
+  --cream:  #FAF6EE;
+  --red:    #A82020;
+  --white:  #FFFFFF;
+  --gray:   #888;
+  --light:  #F3EDE0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Serif JP', serif;
+  background: var(--cream);
+  color: var(--navy);
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 72px;
+  background: rgba(13,31,60,0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(201,168,76,0.3);
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+}
+.logo-jp {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+}
+.logo-num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  color: rgba(201,168,76,0.7);
+  letter-spacing: 0.1em;
+}
+
+nav { display: flex; gap: 36px; }
+nav a {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+nav a:hover { color: var(--gold); }
+
+.nav-entry {
+  padding: 8px 20px;
+  border: 1px solid var(--gold);
+  color: var(--gold) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.15em;
+  transition: background 0.2s !important;
+}
+.nav-entry:hover { background: var(--gold); color: var(--navy) !important; }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--navy);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(168,32,32,0.12) 0%, transparent 60%),
+    linear-gradient(160deg, #0a1628 0%, #0D1F3C 50%, #111d35 100%);
+}
+
+/* 家紋風の円形装飾 */
+.hero-emblem {
+  position: absolute;
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.15);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  animation: rotate 60s linear infinite;
+}
+.hero-emblem::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.1);
+}
+.hero-emblem::after {
+  content: '';
+  position: absolute;
+  inset: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.07);
+}
+@keyframes rotate { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+.hero-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 79px,
+      rgba(201,168,76,0.04) 79px,
+      rgba(201,168,76,0.04) 80px
+    );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.4);
+  padding: 6px 20px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+
+.hero-title-sub {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.4s forwards;
+}
+
+.hero-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(56px, 8vw, 96px);
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.5s forwards;
+}
+
+.hero-title span {
+  color: var(--gold);
+}
+
+.hero-subtitle {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.65s forwards;
+}
+
+.hero-tagline {
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 64px;
+  line-height: 2;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.8s forwards;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeUp 0.8s 1s forwards;
+}
+
+.hero-meta-item {
+  text-align: center;
+}
+.hero-meta-label {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.hero-meta-value {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 16px;
+  color: var(--white);
+  letter-spacing: 0.1em;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeUp 0.8s 1.4s forwards;
+}
+.hero-scroll span {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.3);
+}
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollAnim 1.5s ease-in-out infinite;
+}
+@keyframes scrollAnim {
+  0%,100% { transform: scaleY(1); opacity: 1; }
+  50% { transform: scaleY(0.5); opacity: 0.4; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== SECTION BASE ===== */
+section { padding: 120px 0; }
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: block;
+}
+.section-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900;
+  color: var(--navy);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.section-title-en {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--gray);
+  margin-bottom: 48px;
+}
+
+/* ===== CONCEPT ===== */
+.concept {
+  background: var(--navy);
+  position: relative;
+  overflow: hidden;
+}
+
+.concept::before {
+  content: '甲子園';
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 280px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.025);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.concept .section-label { color: var(--gold2); }
+.concept .section-title { color: var(--white); }
+.concept .section-title-en { color: rgba(255,255,255,0.3); }
+
+.concept-text {
+  font-size: 15px;
+  line-height: 2.6;
+  color: rgba(255,255,255,0.75);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  max-width: 720px;
+}
+
+.concept-quote {
+  margin: 56px 0;
+  padding-left: 24px;
+  border-left: 2px solid var(--gold);
+}
+.concept-quote p {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 18px;
+  color: var(--gold);
+  line-height: 2.2;
+  letter-spacing: 0.1em;
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 72px;
+}
+.concept-card {
+  background: rgba(255,255,255,0.04);
+  padding: 40px;
+  border: 1px solid rgba(201,168,76,0.1);
+  transition: background 0.3s;
+}
+.concept-card:hover { background: rgba(255,255,255,0.07); }
+.concept-card-num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.concept-card-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 18px;
+  color: var(--white);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+.concept-card-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 2;
+}
+
+/* ===== ABOUT ===== */
+.about { background: var(--cream); }
+
+.about-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.about-info { }
+.about-info dl { }
+.about-info dt {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 6px;
+  margin-top: 32px;
+}
+.about-info dt:first-child { margin-top: 0; }
+.about-info dd {
+  font-size: 15px;
+  color: var(--navy);
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(13,31,60,0.1);
+}
+
+.about-theme {
+  background: var(--navy);
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.about-theme::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+.about-theme-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.about-theme-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 22px;
+  color: var(--white);
+  line-height: 1.8;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+.about-theme-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  line-height: 2.2;
+}
+
+/* ===== SCHEDULE ===== */
+.schedule { background: var(--light); }
+
+.timeline {
+  position: relative;
+  padding-left: 40px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px; top: 8px; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 48px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -36px; top: 8px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--cream);
+}
+.timeline-item.highlight::before {
+  background: var(--red);
+  width: 16px; height: 16px;
+  left: -38px; top: 6px;
+  box-shadow: 0 0 12px rgba(168,32,32,0.4);
+}
+
+.timeline-date {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.timeline-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+.timeline-item.highlight .timeline-title {
+  color: var(--red);
+  font-size: 22px;
+}
+.timeline-desc {
+  font-size: 13px;
+  color: var(--gray);
+  line-height: 1.9;
+}
+
+/* ===== FINALISTS ===== */
+.finalists { background: var(--white); }
+
+.finalists-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.finalist-card {
+  background: var(--light);
+  padding: 48px 36px;
+  text-align: center;
+  border: 1px solid rgba(13,31,60,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.finalist-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(13,31,60,0.12);
+}
+
+.finalist-num {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 40px;
+  font-weight: 800;
+  color: rgba(13,31,60,0.1);
+  line-height: 1;
+  margin-bottom: 24px;
+}
+.finalist-pref {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.finalist-name {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 22px;
+  color: var(--navy);
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+}
+.finalist-desc {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 2;
+}
+
+.finalists-tbd {
+  text-align: center;
+  padding: 80px;
+  background: var(--light);
+  border: 1px dashed rgba(201,168,76,0.4);
+}
+.finalists-tbd p {
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--gray);
+  line-height: 2.5;
+}
+
+/* ===== ENTRY ===== */
+.entry {
+  background: var(--navy);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.entry::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,0.07) 0%, transparent 70%);
+}
+.entry .section-title { color: var(--white); }
+.entry .section-title-en { color: rgba(255,255,255,0.3); }
+.entry .section-label { color: var(--gold); }
+
+.entry-text {
+  font-size: 15px;
+  color: rgba(255,255,255,0.65);
+  line-height: 2.4;
+  margin-bottom: 56px;
+  letter-spacing: 0.05em;
+}
+
+.btn-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-block;
+  padding: 16px 48px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+  transition: all 0.25s;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+}
+.btn-primary:hover {
+  background: var(--gold2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+}
+
+/* ===== NEWS ===== */
+.news { background: var(--cream); }
+
+.news-list { }
+.news-item {
+  display: flex;
+  gap: 32px;
+  align-items: baseline;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(13,31,60,0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s;
+}
+.news-item:hover { opacity: 0.65; }
+.news-date {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  white-space: nowrap;
+  min-width: 100px;
+}
+.news-tag {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--gray);
+  border: 1px solid rgba(136,136,136,0.3);
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+.news-title-text {
+  font-size: 14px;
+  color: var(--navy);
+  letter-spacing: 0.05em;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: #070f1e;
+  padding: 72px 0 40px;
+  color: rgba(255,255,255,0.4);
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 56px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.footer-logo {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 12px;
+}
+.footer-org {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.3);
+  line-height: 2;
+}
+.footer-nav {
+  display: flex;
+  gap: 32px;
+}
+.footer-nav a {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-nav a:hover { color: var(--gold); }
+.footer-copy {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  header { padding: 0 20px; }
+  nav { display: none; }
+  .section-inner { padding: 0 24px; }
+  section { padding: 80px 0; }
+  .concept-grid { grid-template-columns: 1fr; }
+  .about-layout { grid-template-columns: 1fr; gap: 40px; }
+  .finalists-grid { grid-template-columns: 1fr; }
+  .hero-meta { gap: 24px; flex-wrap: wrap; }
+  .footer-top { flex-direction: column; gap: 32px; }
+  .footer-nav { flex-wrap: wrap; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo">
+    <span class="logo-jp">旅館甲子園</span>
+    <span class="logo-num">RYOKAN KOSHIEN</span>
+  </a>
+  <nav>
+    <a href="#concept">大会理念</a>
+    <a href="#about">大会概要</a>
+    <a href="#schedule">スケジュール</a>
+    <a href="#finalists">ファイナリスト</a>
+    <a href="#news">ニュース</a>
+    <a href="#entry" class="nav-entry">エントリー</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-emblem"></div>
+  <div class="hero-content">
+    <div class="hero-badge">RYOKAN KOSHIEN 8th</div>
+    <p class="hero-title-sub">第八回</p>
+    <h1 class="hero-title">旅館<span>甲子園</span></h1>
+    <p class="hero-subtitle">RYOKAN KOSHIEN</p>
+    <p class="hero-tagline">
+      宿は人なり<br>
+      ～観光を日本の基幹産業へ　地位向上から日本を元気に～
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <p class="hero-meta-label">VENUE</p>
+        <p class="hero-meta-value">東京国際展示場</p>
+      </div>
+      <div class="hero-meta-item">
+        <p class="hero-meta-label">DATE</p>
+        <p class="hero-meta-value">令和9年3月</p>
+      </div>
+      <div class="hero-meta-item">
+        <p class="hero-meta-label">CAPACITY</p>
+        <p class="hero-meta-value">700名</p>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- CONCEPT -->
+<section class="concept" id="concept">
+  <div class="section-inner">
+    <span class="section-label">PHILOSOPHY</span>
+    <h2 class="section-title">大会理念</h2>
+    <p class="section-title-en">The Philosophy of Ryokan Koshien</p>
+
+    <p class="concept-text">
+      我々は日本全国より様々な魅力や特徴、文化、歴史を時代とともに繋いできた宿泊施設を集い、
+      「宿泊産業で働く魅力」「経営理念」「おもてなしの想い」「観光がもたらす明るい未来」、
+      それらを具現化する取り組みや手法を全国の仲間に発表し、共に学び、高めあう研鑽の場を設けます。
+    </p>
+
+    <div class="concept-quote">
+      <p>「自分の仕事に誇りを持ち、情熱的に働く姿」<br>「仲間と夢を共感し、それに向かって努力する姿勢」</p>
+    </div>
+
+    <p class="concept-text">
+      その姿は、それを観る全ての人に感動を与え、他の何よりも輝きを放ちます。
+      この大会を通じ、業界全体のモチベーションアップやスキルアップは当然のこと、
+      宿泊産業の地位向上を図ると共に、世界に誇れるおもてなし産業の構築を目指し、
+      観光を日本の基幹産業へと押し上げます。
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <p class="concept-card-num">01</p>
+        <h3 class="concept-card-title">宿泊産業で働く魅力</h3>
+        <p class="concept-card-text">スタッフ一人ひとりの輝きと情熱を全国に発信し、宿で働くことの誇りと魅力を伝えます。</p>
+      </div>
+      <div class="concept-card">
+        <p class="concept-card-num">02</p>
+        <h3 class="concept-card-title">経営理念・おもてなしの想い</h3>
+        <p class="concept-card-text">経営者とスタッフの夢が共有され、それがお客様の喜びや感動として伝わっている取り組みを発表します。</p>
+      </div>
+      <div class="concept-card">
+        <p class="concept-card-num">03</p>
+        <h3 class="concept-card-title">地域・観光との共創</h3>
+        <p class="concept-card-text">地域と共に、これからの観光の未来に向けて動いている宿泊施設の取り組みを世界に発信します。</p>
+      </div>
+      <div class="concept-card">
+        <p class="concept-card-num">04</p>
+        <h3 class="concept-card-title">世界基準のおもてなし</h3>
+        <p class="concept-card-text">世界基準を見据えた、おもてなしの心の発信に取り組み、日本が誇るホスピタリティを構築します。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <span class="section-label">OVERVIEW</span>
+    <h2 class="section-title">大会概要</h2>
+    <p class="section-title-en">About the Tournament</p>
+
+    <div class="about-layout">
+      <dl class="about-info">
+        <dt>大会名称</dt>
+        <dd>第八回旅館甲子園</dd>
+        <dt>主催</dt>
+        <dd>全国旅館ホテル生活衛生同業組合連合会青年部<br>未来事業委員会</dd>
+        <dt>開催日時</dt>
+        <dd>令和9年（2027年）3月（予定）</dd>
+        <dt>会場</dt>
+        <dd>東京国際展示場<br>会議棟1階 レセプションホール（予定）</dd>
+        <dt>想定来場者数</dt>
+        <dd>700名</dd>
+        <dt>出場資格</dt>
+        <dd>全国旅館ホテル生活衛生同業組合連合会に所属する全国9ブロック約1,500施設より、各都道府県部長の推薦を受けた施設</dd>
+        <dt>審査方法</dt>
+        <dd>審査員による採点＋会場投票（30・20・10ポイント加算）</dd>
+        <dt>プレゼンテーション時間</dt>
+        <dd>各施設15分</dd>
+      </dl>
+
+      <div class="about-theme">
+        <p class="about-theme-label">THEME</p>
+        <h3 class="about-theme-title">「宿は人なり」</h3>
+        <p class="about-theme-text">
+          第八回旅館甲子園では、全国の宿屋で働く人や取り組みにフォーカスし、
+          広く伝えることのできる素晴らしい大会とすることを目指します。<br><br>
+          アフターコロナにおける宿屋の思いや取り組みをしっかりと伝えることのできる大会にしていきます。<br><br>
+          過去7回の開催を通じて積み重ねてきた感動と学びを、さらに大きなステージで発信します。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section class="schedule" id="schedule">
+  <div class="section-inner">
+    <span class="section-label">TIMELINE</span>
+    <h2 class="section-title">スケジュール</h2>
+    <p class="section-title-en">Timeline to the Grand Final</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <p class="timeline-date">令和8年（2026年）7月</p>
+        <h3 class="timeline-title">第1回実行委員会</h3>
+        <p class="timeline-desc">実行委員会発足・役割分担の確認・大会概要の検討開始</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-date">令和8年（2026年）8〜9月</p>
+        <h3 class="timeline-title">出場施設エントリー募集開始</h3>
+        <p class="timeline-desc">全国9ブロック約1,500施設より出場施設を募集。各都道府県部長の推薦を受けた施設からエントリー。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-date">令和8年（2026年）10〜11月</p>
+        <h3 class="timeline-title">一次・二次審査</h3>
+        <p class="timeline-desc">宿フェス旅館甲子園部会による厳正な書類審査を実施。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-date">令和8年（2026年）12月</p>
+        <h3 class="timeline-title">ファイナリスト発表</h3>
+        <p class="timeline-desc">審査を勝ち進んだファイナリスト3施設を発表。各施設のサポーター募集も開始。</p>
+      </div>
+      <div class="timeline-item">
+        <p class="timeline-date">令和9年（2027年）1〜2月</p>
+        <h3 class="timeline-title">決勝大会準備</h3>
+        <p class="timeline-desc">各ファイナリストによるプレゼンテーション準備・リハーサル。</p>
+      </div>
+      <div class="timeline-item highlight">
+        <p class="timeline-date">令和9年（2027年）3月</p>
+        <h3 class="timeline-title">🏆 第八回旅館甲子園　決勝大会</h3>
+        <p class="timeline-desc">東京国際展示場 会議棟1階 レセプションホール（予定）｜700名来場予定</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINALISTS -->
+<section class="finalists" id="finalists">
+  <div class="section-inner">
+    <span class="section-label">FINALISTS</span>
+    <h2 class="section-title">ファイナリスト</h2>
+    <p class="section-title-en">Finalists of the 8th Tournament</p>
+
+    <div class="finalists-tbd">
+      <p>
+        ファイナリストは令和8年12月に発表予定です。<br>
+        全国の宿泊施設よりエントリーをお待ちしております。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ENTRY -->
+<section class="entry" id="entry">
+  <div class="section-inner">
+    <span class="section-label">ENTRY</span>
+    <h2 class="section-title">エントリー</h2>
+    <p class="section-title-en">Join the Tournament</p>
+
+    <p class="entry-text">
+      第八回旅館甲子園へのエントリーを募集しています。<br>
+      全国旅館ホテル生活衛生同業組合連合会に所属する施設であれば、<br>
+      各都道府県部長へご相談の上、エントリーいただけます。<br><br>
+      宿泊産業の魅力と想いを、全国・世界へ発信しましょう。
+    </p>
+
+    <div class="btn-group">
+      <a href="#" class="btn btn-primary">エントリーについて詳しく</a>
+      <a href="#about" class="btn btn-outline">大会概要を確認する</a>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="news" id="news">
+  <div class="section-inner">
+    <span class="section-label">NEWS</span>
+    <h2 class="section-title">ニュース</h2>
+    <p class="section-title-en">Latest News</p>
+
+    <div class="news-list">
+      <a href="#" class="news-item">
+        <span class="news-date">2026.05.19</span>
+        <span class="news-tag">お知らせ</span>
+        <span class="news-title-text">第八回旅館甲子園　公式サイトをオープンしました</span>
+      </a>
+      <a href="#" class="news-item">
+        <span class="news-date">2026.05.19</span>
+        <span class="news-tag">お知らせ</span>
+        <span class="news-title-text">実行委員会を立ち上げました。エントリー募集は令和8年9月より開始予定です</span>
+      </a>
+      <a href="#" class="news-item">
+        <span class="news-date">2026.05.19</span>
+        <span class="news-tag">大会情報</span>
+        <span class="news-title-text">第八回旅館甲子園　令和9年3月・東京国際展示場での開催を予定しています</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <p class="footer-logo">旅館甲子園</p>
+        <p class="footer-org">
+          全国旅館ホテル生活衛生同業組合連合会青年部<br>
+          未来事業委員会
+        </p>
+      </div>
+      <nav class="footer-nav">
+        <a href="#concept">大会理念</a>
+        <a href="#about">大会概要</a>
+        <a href="#schedule">スケジュール</a>
+        <a href="#finalists">ファイナリスト</a>
+        <a href="#news">ニュース</a>
+        <a href="#entry">エントリー</a>
+      </nav>
+    </div>
+    <p class="footer-copy">© 2026 全国旅館ホテル生活衛生同業組合連合会青年部 未来事業委員会</p>
+  </div>
+</footer>
+
+</body>
+</html>
