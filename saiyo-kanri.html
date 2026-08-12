@@ -528,7 +528,7 @@ function uid(p) { return p + '_' + (state.seq++).toString(36) + Date.now().toStr
 
 /* ---------- seed ---------- */
 function seed() {
-  state = { seq: 1, ryokan: { name: 'ひふみ旅館', area: '長野県・信州', copy: '創業百年、信州の温泉宿。スタッフの笑顔がいちばんのおもてなしです。' }, channels: [], jobs: [], apps: [] };
+  state = { seq: 1, ryokan: { name: 'ひふみ旅館', area: '京都府・京都駅前', copy: '京都駅から徒歩5分。国内外のお客様を和のおもてなしでお迎えする町家旅館です。スタッフの笑顔がいちばんのおもてなしです。' }, channels: [], jobs: [], apps: [] };
   const ch = (name, kind, status, cost, color) => { const c = { id: uid('c'), name, kind, status, cost, color, note:'' }; state.channels.push(c); return c.id; };
   const cIndeed = ch('Indeed', '有料求人媒体', 'active', 50000, '#2557A7');
   const cTown   = ch('タウンワーク', '有料求人媒体', 'active', 80000, '#FF6A6A');
@@ -538,10 +538,10 @@ function seed() {
   const cOmo    = ch('おもてなしHR', '有料求人媒体', 'paused', 60000, '#00A4BD');
 
   const job = (title, emp, salary, place, desc, req, channelIds) => { const j = { id: uid('j'), title, emp, salary, place, desc, req, status:'open', channelIds, createdAt: Date.now()-86400000*20 }; state.jobs.push(j); return j.id; };
-  const jFront = job('フロント・接客スタッフ', '正社員', '月給 23〜28万円', '長野県山ノ内町', 'チェックイン・チェックアウト対応、館内案内、予約管理を担当いただきます。未経験からでも先輩がしっかりサポートします。', '未経験可／おもてなしに興味のある方', [cIndeed, cTown, cOwn, cHello]);
-  const jClean = job('客室清掃スタッフ', 'パート・アルバイト', '時給 1,150円〜', '長野県山ノ内町', '客室の清掃・ベッドメイキング。短時間勤務・扶養内OK、シフト相談可。', '未経験歓迎／シニア活躍中', [cAir, cTown, cHello]);
-  const jCook  = job('調理補助', 'パート・アルバイト', '時給 1,200円〜', '長野県山ノ内町', '朝夕の料理の盛り付け・下ごしらえ・洗い場など。板前のもとで学べます。', '未経験可', [cIndeed, cAir]);
-  const jRsv   = job('予約・電話対応スタッフ', '契約社員', '月給 20〜24万円', '長野県山ノ内町（一部在宅可）', '電話・メール・OTAサイトの予約管理。PC基本操作ができる方歓迎。', 'PC基本操作／接客経験優遇', [cOwn, cIndeed]);
+  const jFront = job('フロント・接客スタッフ', '正社員', '月給 23〜28万円', '京都市下京区（京都駅より徒歩5分）', 'チェックイン・チェックアウト対応、館内案内、予約管理を担当いただきます。英語での接客歓迎、未経験からでも先輩がしっかりサポートします。', '未経験可／おもてなしに興味のある方', [cIndeed, cTown, cOwn, cHello]);
+  const jClean = job('客室清掃スタッフ', 'パート・アルバイト', '時給 1,150円〜', '京都市下京区（京都駅より徒歩5分）', '客室の清掃・ベッドメイキング。短時間勤務・扶養内OK、シフト相談可。', '未経験歓迎／シニア活躍中', [cAir, cTown, cHello]);
+  const jCook  = job('調理補助', 'パート・アルバイト', '時給 1,200円〜', '京都市下京区（京都駅より徒歩5分）', '朝夕の料理の盛り付け・下ごしらえ・洗い場など。板前のもとで学べます。', '未経験可', [cIndeed, cAir]);
+  const jRsv   = job('予約・電話対応スタッフ', '契約社員', '月給 20〜24万円', '京都市下京区（一部在宅可）', '電話・メール・OTAサイトの予約管理。PC基本操作ができる方歓迎。', 'PC基本操作／接客経験優遇', [cOwn, cIndeed]);
 
   const app = (name, jobId, chId, status, days, email, tel, msg) => state.apps.push({ id: uid('a'), name, jobId, channelId: chId, status, email, tel, msg, memo:'', appliedAt: Date.now()-86400000*days });
   app('田中 美咲', jFront, cIndeed, 'interview', 5, 'tanaka@example.com', '090-1234-5678', '接客業の経験を活かして、地域に根ざした宿で働きたいです。', );
@@ -552,7 +552,7 @@ function seed() {
   app('渡辺 彩',   jRsv, cOwn, 'screening', 4, 'watanabe@example.com', '070-1111-2222', '予約管理の実務経験があります。在宅勤務にも興味があります。');
   app('山本 大輔', jClean, cTown, 'rejected', 12, 'yamamoto@example.com', '090-3333-1111', '');
   app('中村 花子', jCook, cIndeed, 'interview', 6, 'nakamura@example.com', '080-5555-6666', '朝の時間帯で働きたいです。');
-  app('小林 誠',   jFront, cIndeed, 'new', 2, 'kobayashi@example.com', '070-7777-8888', '接客が好きです。長野へ移住予定です。');
+  app('小林 誠',   jFront, cIndeed, 'new', 2, 'kobayashi@example.com', '070-7777-8888', '接客が好きです。京都で働きたく、駅近の勤務地に惹かれました。');
   save();
 }
 
@@ -891,7 +891,7 @@ function viewSettings() {
     <div class="panel-body" style="padding:20px 22px;">
       <div class="field-row">
         <div class="field"><label>旅館名</label><input id="set-name" value="${esc(r.name)}"></div>
-        <div class="field"><label>エリア</label><input id="set-area" value="${esc(r.area||'')}" placeholder="例）長野県・信州"></div>
+        <div class="field"><label>エリア</label><input id="set-area" value="${esc(r.area||'')}" placeholder="例）京都府・京都駅前"></div>
       </div>
       <div class="field" style="margin-bottom:6px;"><label>紹介文（メモ）</label><textarea id="set-copy" placeholder="採用ページなどで使う紹介文">${esc(r.copy||'')}</textarea></div>
       <button class="btn btn-primary btn-sm" data-savesettings>基本情報を保存</button>
@@ -984,7 +984,7 @@ function jobFormModal(jobId) {
       </div>
       <div class="field-row">
         <div class="field"><label>給与</label><input id="j-salary" value="${j?esc(j.salary):''}" placeholder="例）月給 23〜28万円"></div>
-        <div class="field"><label>勤務地</label><input id="j-place" value="${j?esc(j.place):''}" placeholder="例）長野県山ノ内町"></div>
+        <div class="field"><label>勤務地</label><input id="j-place" value="${j?esc(j.place):''}" placeholder="例）京都市下京区（京都駅徒歩5分）"></div>
       </div>
       <div class="field"><label>仕事内容</label><textarea id="j-desc" placeholder="業務内容を記載します">${j?esc(j.desc):''}</textarea></div>
       <div class="field"><label>応募資格</label><input id="j-req" value="${j?esc(j.req):''}" placeholder="例）未経験可／おもてなしに興味のある方"></div>
