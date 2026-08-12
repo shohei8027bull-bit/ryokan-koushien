@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>採用管理コンソール | 旅館甲子園</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #0D1F3C;
+  --navy2:  #142A4E;
+  --gold:   #C9A84C;
+  --gold2:  #E8C96D;
+  --cream:  #FAF6EE;
+  --red:    #A82020;
+  --white:  #FFFFFF;
+  --gray:   #7C8598;
+  --light:  #F3EDE0;
+  --line:   rgba(13,31,60,0.10);
+  --ok:     #2F8F5B;
+  --warn:   #C7871F;
+  --sans: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Meiryo", sans-serif;
+  --serif: 'Zen Old Mincho', 'Noto Serif JP', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--cream);
+  color: var(--navy);
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+a { color: inherit; }
+
+/* ===== LAYOUT ===== */
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  background: var(--navy);
+  color: rgba(255,255,255,0.75);
+  padding: 26px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(201,168,76,0.2);
+}
+.brand { padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.brand-jp {
+  font-family: var(--serif);
+  font-size: 17px; font-weight: 900;
+  color: var(--gold); letter-spacing: 0.22em; display: block;
+}
+.brand-sub {
+  font-size: 10px; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.4); margin-top: 6px;
+}
+.nav { padding: 18px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 8px;
+  font-size: 13px; letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.72);
+  background: none; border: none; width: 100%; text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+.nav-item.active { background: rgba(201,168,76,0.15); color: var(--gold2); }
+.nav-item .ico { width: 18px; height: 18px; flex: 0 0 18px; }
+.nav-item .ico svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.6; }
+.nav-badge {
+  margin-left: auto; font-size: 11px; min-width: 20px; text-align: center;
+  background: rgba(201,168,76,0.2); color: var(--gold2);
+  border-radius: 20px; padding: 1px 7px;
+}
+.sidebar-foot {
+  padding: 16px 24px 0; border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 10px; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); line-height: 1.9;
+}
+.sidebar-foot a { color: var(--gold); text-decoration: none; }
+
+/* ===== MAIN ===== */
+.main { display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 32px; height: 68px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 40;
+}
+.topbar h1 {
+  font-family: var(--serif); font-size: 21px; font-weight: 900;
+  letter-spacing: 0.06em; color: var(--navy);
+}
+.topbar-sub { font-size: 11px; color: var(--gray); letter-spacing: 0.14em; margin-top: 2px; }
+.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--cream); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 12px; width: 240px;
+}
+.search-box input { border: none; background: none; outline: none; font-size: 13px; width: 100%; color: var(--navy); }
+.search-box svg { width: 15px; height: 15px; stroke: var(--gray); fill: none; stroke-width: 1.8; flex: 0 0 15px; }
+
+.content { padding: 32px; flex: 1; max-width: 1240px; width: 100%; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 18px; border-radius: 8px; border: none;
+  font-size: 13px; letter-spacing: 0.06em; font-weight: 700;
+  transition: all 0.18s; white-space: nowrap;
+}
+.btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.9; }
+.btn-primary { background: var(--gold); color: var(--navy); }
+.btn-primary:hover { background: var(--gold2); box-shadow: 0 6px 18px rgba(201,168,76,0.3); transform: translateY(-1px); }
+.btn-navy { background: var(--navy); color: var(--white); }
+.btn-navy:hover { background: var(--navy2); transform: translateY(-1px); }
+.btn-outline { background: var(--white); color: var(--navy); border: 1px solid var(--line); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-ghost { background: none; color: var(--gray); padding: 8px 12px; }
+.btn-ghost:hover { color: var(--navy); background: var(--cream); }
+.btn-danger { background: none; color: var(--red); border: 1px solid rgba(168,32,32,0.25); }
+.btn-danger:hover { background: rgba(168,32,32,0.07); }
+.btn-sm { padding: 7px 12px; font-size: 12px; }
+
+/* ===== KPI CARDS ===== */
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px; gap: 20px; flex-wrap: wrap; }
+.page-head .lead { font-size: 13px; color: var(--gray); margin-top: 8px; line-height: 1.7; }
+.section-label { font-size: 10px; letter-spacing: 0.34em; color: var(--gold); font-weight: 700; }
+.section-title { font-family: var(--serif); font-size: 26px; font-weight: 900; letter-spacing: 0.05em; margin-top: 6px; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.kpi {
+  background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+  padding: 22px; position: relative; overflow: hidden;
+}
+.kpi::after {
+  content: ''; position: absolute; top: -30px; right: -30px;
+  width: 90px; height: 90px; border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.15);
+}
+.kpi-label { font-size: 11px; letter-spacing: 0.14em; color: var(--gray); margin-bottom: 12px; }
+.kpi-value { font-family: var(--serif); font-size: 38px; font-weight: 900; line-height: 1; color: var(--navy); }
+.kpi-value small { font-size: 15px; font-weight: 700; color: var(--gray); margin-left: 4px; }
+.kpi-foot { font-size: 11px; color: var(--gray); margin-top: 10px; }
+.kpi-foot b { color: var(--ok); }
+
+/* ===== CARD / PANEL ===== */
+.panel { background: var(--white); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 18px 22px; border-bottom: 1px solid var(--line);
+}
+.panel-head h3 { font-family: var(--serif); font-size: 17px; font-weight: 700; letter-spacing: 0.05em; }
+.panel-head .sub { font-size: 11px; color: var(--gray); margin-top: 3px; letter-spacing: 0.08em; }
+.panel-body { padding: 6px 22px 10px; }
+
+.two-col { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+
+/* ===== TABLE ===== */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th {
+  text-align: left; font-size: 11px; letter-spacing: 0.1em; color: var(--gray);
+  font-weight: 700; padding: 14px 10px; border-bottom: 1px solid var(--line);
+}
+.tbl td { padding: 15px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr.clickable { transition: background 0.12s; }
+.tbl tr.clickable:hover { background: var(--cream); cursor: pointer; }
+.tbl .strong { font-weight: 700; }
+
+/* ===== BADGE / STATUS ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; letter-spacing: 0.06em; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+}
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.b-published { background: rgba(47,143,91,0.12); color: var(--ok); }
+.b-draft { background: rgba(124,133,152,0.14); color: var(--gray); }
+.b-closed { background: rgba(168,32,32,0.10); color: var(--red); }
+.b-open { background: rgba(47,143,91,0.12); color: var(--ok); }
+.s-new { background: rgba(201,168,76,0.18); color: #9c7f2e; }
+.s-screening { background: rgba(20,42,78,0.10); color: var(--navy); }
+.s-interview { background: rgba(199,135,31,0.15); color: var(--warn); }
+.s-offer { background: rgba(47,143,91,0.15); color: var(--ok); }
+.s-rejected { background: rgba(124,133,152,0.14); color: var(--gray); }
+
+/* facility avatar */
+.avatar {
+  width: 38px; height: 38px; border-radius: 9px; flex: 0 0 38px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-weight: 900; font-size: 17px; color: var(--white);
+}
+.cell-facility { display: flex; align-items: center; gap: 12px; }
+.cell-facility .meta .nm { font-weight: 700; font-size: 13.5px; }
+.cell-facility .meta .ar { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+/* ===== SITES GRID ===== */
+.filters { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.chip {
+  padding: 8px 16px; border-radius: 20px; font-size: 12px; letter-spacing: 0.05em;
+  background: var(--white); border: 1px solid var(--line); color: var(--gray); font-weight: 700;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: var(--gold); color: var(--navy); }
+.chip.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+.site-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.site-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+  overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
+  display: flex; flex-direction: column;
+}
+.site-card:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(13,31,60,0.12); }
+.site-card-top { padding: 22px 22px 16px; display: flex; align-items: flex-start; gap: 14px; }
+.site-card-top .avatar { width: 46px; height: 46px; flex-basis: 46px; border-radius: 11px; font-size: 20px; }
+.site-card-name { font-family: var(--serif); font-size: 18px; font-weight: 700; letter-spacing: 0.04em; }
+.site-card-area { font-size: 11px; color: var(--gray); margin-top: 4px; letter-spacing: 0.08em; }
+.site-card-copy { font-size: 12px; color: var(--gray); line-height: 1.8; padding: 0 22px 18px; min-height: 44px; }
+.site-card-stats {
+  display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+.site-card-stat { padding: 14px; text-align: center; }
+.site-card-stat + .site-card-stat { border-left: 1px solid var(--line); }
+.site-card-stat .n { font-family: var(--serif); font-size: 22px; font-weight: 900; }
+.site-card-stat .l { font-size: 10px; color: var(--gray); letter-spacing: 0.1em; margin-top: 2px; }
+.site-card-foot { padding: 12px 22px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+
+/* ===== DETAIL ===== */
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray); margin-bottom: 16px; }
+.breadcrumb a { color: var(--gold); text-decoration: none; cursor: pointer; }
+.breadcrumb a:hover { text-decoration: underline; }
+.detail-hero {
+  background: var(--navy); color: var(--white); border-radius: 14px;
+  padding: 30px 32px; display: flex; align-items: center; gap: 22px; margin-bottom: 24px;
+  position: relative; overflow: hidden;
+}
+.detail-hero::before {
+  content: ''; position: absolute; top: -50px; right: -20px; width: 180px; height: 180px;
+  border-radius: 50%; border: 1px solid rgba(201,168,76,0.2);
+}
+.detail-hero .avatar { width: 64px; height: 64px; flex-basis: 64px; border-radius: 14px; font-size: 27px; }
+.detail-hero h2 { font-family: var(--serif); font-size: 27px; font-weight: 900; letter-spacing: 0.05em; }
+.detail-hero .area { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 6px; letter-spacing: 0.1em; }
+.detail-hero .copy { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 10px; line-height: 1.7; max-width: 560px; }
+.detail-hero-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; z-index: 1; }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+.tab {
+  padding: 12px 20px; font-size: 13px; letter-spacing: 0.05em; font-weight: 700;
+  color: var(--gray); background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab:hover { color: var(--navy); }
+.tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+.tab .cnt { color: var(--gray); font-weight: 400; margin-left: 5px; }
+
+/* job list item */
+.job-row {
+  border: 1px solid var(--line); border-radius: 11px; padding: 20px 22px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 18px; background: var(--white); transition: border-color 0.15s;
+}
+.job-row:hover { border-color: var(--gold); }
+.job-row .jinfo { flex: 1; min-width: 0; }
+.job-row .jtitle { font-family: var(--serif); font-size: 17px; font-weight: 700; letter-spacing: 0.03em; }
+.job-tags { display: flex; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
+.job-tag { font-size: 11px; color: var(--gray); background: var(--cream); border: 1px solid var(--line); padding: 3px 10px; border-radius: 6px; }
+.job-tag.salary { color: var(--navy); font-weight: 700; }
+.job-row .jstat { display: flex; align-items: center; gap: 14px; }
+.job-row .japps { text-align: center; }
+.job-row .japps .n { font-family: var(--serif); font-size: 22px; font-weight: 900; }
+.job-row .japps .l { font-size: 10px; color: var(--gray); }
+
+/* ===== PIPELINE (applicants kanban) ===== */
+.pipeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.pipe-col { background: var(--cream); border-radius: 11px; padding: 12px; min-height: 200px; }
+.pipe-col-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 12px; }
+.pipe-col-head .t { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; }
+.pipe-col-head .c { font-size: 11px; color: var(--gray); background: var(--white); border-radius: 20px; padding: 1px 9px; }
+.pipe-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: 9px;
+  padding: 13px; margin-bottom: 9px; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s;
+}
+.pipe-card:hover { box-shadow: 0 6px 16px rgba(13,31,60,0.1); transform: translateY(-2px); }
+.pipe-card .nm { font-weight: 700; font-size: 13.5px; }
+.pipe-card .jb { font-size: 11px; color: var(--gray); margin-top: 4px; }
+.pipe-card .dt { font-size: 10px; color: var(--gold); margin-top: 8px; letter-spacing: 0.08em; }
+.pipe-empty { font-size: 11px; color: var(--gray); text-align: center; padding: 20px 0; }
+
+/* ===== EMPTY STATE ===== */
+.empty {
+  text-align: center; padding: 70px 24px; background: var(--white);
+  border: 1px dashed rgba(201,168,76,0.45); border-radius: 12px;
+}
+.empty svg { width: 46px; height: 46px; stroke: var(--gold); fill: none; stroke-width: 1.4; margin-bottom: 16px; }
+.empty h4 { font-family: var(--serif); font-size: 18px; margin-bottom: 8px; }
+.empty p { font-size: 13px; color: var(--gray); line-height: 1.9; margin-bottom: 20px; }
+
+/* ===== MODAL ===== */
+.overlay {
+  position: fixed; inset: 0; background: rgba(13,31,60,0.55); backdrop-filter: blur(3px);
+  display: flex; align-items: flex-start; justify-content: center; padding: 48px 20px;
+  z-index: 200; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.overlay.show { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--cream); border-radius: 16px; width: 100%; max-width: 620px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4); transform: translateY(14px); transition: transform 0.2s;
+  overflow: hidden;
+}
+.overlay.show .modal { transform: translateY(0); }
+.modal-head {
+  background: var(--navy); color: var(--white); padding: 22px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; letter-spacing: 0.05em; }
+.modal-head .sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; letter-spacing: 0.1em; }
+.modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 26px; line-height: 1; padding: 0 4px; }
+.modal-close:hover { color: var(--white); }
+.modal-body { padding: 26px 28px; max-height: 62vh; overflow-y: auto; }
+.modal-foot { padding: 18px 28px; background: var(--white); border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 10px; }
+
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 7px; color: var(--navy); }
+.field label .req { color: var(--red); margin-left: 4px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 13px; border: 1px solid var(--line); border-radius: 8px;
+  font-size: 13.5px; background: var(--white); color: var(--navy); outline: none; transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
+.field textarea { min-height: 96px; resize: vertical; line-height: 1.7; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field .hint { font-size: 11px; color: var(--gray); margin-top: 6px; }
+.color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-swatch { width: 32px; height: 32px; border-radius: 8px; border: 2px solid transparent; }
+.color-swatch.sel { border-color: var(--navy); box-shadow: 0 0 0 2px var(--white) inset; }
+
+/* ===== PUBLIC PREVIEW ===== */
+.preview-frame { background: var(--navy); border-radius: 14px; padding: 0; overflow: hidden; }
+.preview-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.05); }
+.preview-bar .dots { display: flex; gap: 6px; }
+.preview-bar .dots span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+.preview-bar .url { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 10px; letter-spacing: 0.05em; }
+.pub {
+  background: var(--cream); color: var(--navy); padding: 0; min-height: 300px;
+}
+.pub-hero { background: var(--navy); color: var(--white); padding: 60px 48px; text-align: center; position: relative; overflow: hidden; }
+.pub-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 60% at 50% 30%, rgba(201,168,76,0.1), transparent 70%); }
+.pub-hero .pl { font-size: 11px; letter-spacing: 0.3em; color: var(--gold); position: relative; }
+.pub-hero h1 { font-family: var(--serif); font-size: 34px; font-weight: 900; letter-spacing: 0.05em; margin: 14px 0 12px; position: relative; }
+.pub-hero .copy { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.9; position: relative; max-width: 560px; margin: 0 auto; }
+.pub-body { padding: 40px 48px; }
+.pub-sec-title { font-family: var(--serif); font-size: 20px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px; }
+.pub-sec-en { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 22px; }
+.pub-job { background: var(--white); border: 1px solid var(--line); border-radius: 11px; padding: 22px; margin-bottom: 14px; }
+.pub-job h4 { font-family: var(--serif); font-size: 17px; margin-bottom: 10px; }
+.pub-job .pub-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pub-job .pub-tag { font-size: 11px; background: var(--cream); border: 1px solid var(--line); padding: 4px 11px; border-radius: 6px; }
+.pub-job p { font-size: 13px; color: var(--gray); line-height: 1.9; }
+.pub-apply { text-align: center; padding: 30px 0 10px; }
+
+/* ===== SETTINGS ===== */
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--line);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row .info h4 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+.settings-row .info p { font-size: 12px; color: var(--gray); line-height: 1.7; }
+
+/* ===== TOAST ===== */
+.toast-wrap { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.toast {
+  background: var(--navy); color: var(--white); padding: 13px 24px; border-radius: 10px;
+  font-size: 13px; letter-spacing: 0.04em; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 10px; animation: toastIn 0.25s ease;
+  border-left: 3px solid var(--gold);
+}
+.toast svg { width: 16px; height: 16px; stroke: var(--gold2); fill: none; stroke-width: 2; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.activity-item { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin-top: 6px; flex: 0 0 8px; }
+.activity-item .txt { font-size: 13px; line-height: 1.6; }
+.activity-item .txt b { font-weight: 700; }
+.activity-item .tm { font-size: 11px; color: var(--gray); margin-top: 3px; }
+
+.mobile-only { display: none; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1080px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .site-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .pipeline { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 240px; z-index: 150;
+    transform: translateX(-100%); transition: transform 0.25s;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .mobile-only { display: inline-flex; }
+  .content { padding: 20px; }
+  .topbar { padding: 0 18px; }
+  .topbar h1 { font-size: 17px; }
+  .search-box { display: none; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .site-grid { grid-template-columns: 1fr; }
+  .pipeline { grid-template-columns: 1fr; }
+  .detail-hero { flex-direction: column; align-items: flex-start; }
+  .detail-hero-actions { margin-left: 0; }
+  .field-row { grid-template-columns: 1fr; }
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 140; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="brand-jp">旅館甲子園</span>
+      <span class="brand-sub">採用管理コンソール</span>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nav-item" data-view="dashboard">
+        <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
+        ダッシュボード
+      </button>
+      <button class="nav-item" data-view="sites">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></span>
+        採用サイト
+        <span class="nav-badge" id="badge-sites">0</span>
+      </button>
+      <button class="nav-item" data-view="jobs">
+        <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>
+        求人
+        <span class="nav-badge" id="badge-jobs">0</span>
+      </button>
+      <button class="nav-item" data-view="applicants">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        応募者
+        <span class="nav-badge" id="badge-apps">0</span>
+      </button>
+      <button class="nav-item" data-view="settings">
+        <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        設定
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      全国旅館ホテル生活衛生同業組合連合会青年部<br>
+      未来事業委員会<br>
+      <a href="index.html">← 大会サイトへ戻る</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <button class="btn btn-ghost mobile-only" id="menuBtn" style="padding:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div>
+        <h1 id="topTitle">ダッシュボード</h1>
+        <div class="topbar-sub" id="topSub">採用活動の全体状況</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="globalSearch" placeholder="施設・求人・応募者を検索">
+        </div>
+        <button class="btn btn-primary" id="quickAdd">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          採用サイトを作成
+        </button>
+      </div>
+    </header>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="overlay" id="overlay"></div>
+
+<script>
+/* ============================================================
+   旅館甲子園 採用管理コンソール
+   単体HTML / 依存なし / localStorage 永続化
+   ============================================================ */
+
+const STORE_KEY = 'ryokan_saiyo_v1';
+const PALETTE = ['#0D1F3C','#A82020','#2F8F5B','#C7871F','#3C5A8C','#7A3B6E','#1F6F6B'];
+const AREAS = ['北海道','東北','関東','中部','近畿','中国','四国','九州・沖縄'];
+const EMP_TYPES = ['正社員','契約社員','パート・アルバイト','業務委託'];
+const STATUS = {
+  new:       { label: '新規',   cls: 's-new' },
+  screening: { label: '選考中', cls: 's-screening' },
+  interview: { label: '面接',   cls: 's-interview' },
+  offer:     { label: '内定',   cls: 's-offer' },
+  rejected:  { label: '見送り', cls: 's-rejected' },
+};
+const STATUS_ORDER = ['new','screening','interview','offer','rejected'];
+const SITE_STATUS = {
+  published: { label: '公開中', cls: 'b-published' },
+  draft:     { label: '下書き', cls: 'b-draft' },
+  closed:    { label: '停止中', cls: 'b-closed' },
+};
+
+/* ---------- state ---------- */
+let state = { sites: [], seq: 1 };
+let view = 'dashboard';
+let currentSiteId = null;
+let currentTab = 'jobs';
+let searchTerm = '';
+
+/* ---------- persistence ---------- */
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function load() {
+  const raw = localStorage.getItem(STORE_KEY);
+  if (raw) { try { state = JSON.parse(raw); return true; } catch(e){} }
+  return false;
+}
+function uid(prefix) { return prefix + '_' + (state.seq++).toString(36) + Date.now().toString(36).slice(-3); }
+
+/* ---------- seed data ---------- */
+function seed() {
+  state = { seq: 1, sites: [
+    {
+      id: uid('s'), name: '海鳴りの宿 潮里', area: '中部', color: '#0D1F3C',
+      copy: '駿河湾を望む全12室の小さな宿。少人数だからこそ、一人ひとりのお客様に深く寄り添うおもてなしを大切にしています。',
+      status: 'published', createdAt: Date.now() - 86400000 * 24,
+      jobs: [
+        { id: uid('j'), title: 'フロント・接客スタッフ', emp: '正社員', salary: '月給 23〜28万円', place: '静岡県沼津市', desc: 'チェックイン・チェックアウト対応、館内案内、予約管理を担当いただきます。未経験からでも先輩がしっかりサポートします。', req: '未経験可／おもてなしに興味のある方', status: 'open', createdAt: Date.now() - 86400000 * 20 },
+        { id: uid('j'), title: '調理スタッフ（和食）', emp: '正社員', salary: '月給 26〜34万円', place: '静岡県沼津市', desc: '地元の海の幸を活かした会席料理の調理をお任せします。板長のもとで技術を磨けます。', req: '和食調理経験2年以上', status: 'open', createdAt: Date.now() - 86400000 * 15 },
+      ],
+      apps: [
+        { id: uid('a'), name: '田中 美咲', jobIdx: 0, email: 'tanaka@example.com', tel: '090-1234-5678', msg: '接客業の経験を活かして、地域に根ざした宿で働きたいと考えています。', status: 'interview', appliedAt: Date.now() - 86400000 * 5 },
+        { id: uid('a'), name: '佐藤 健一', jobIdx: 1, email: 'sato@example.com', tel: '080-2222-3333', msg: '和食の経験を活かしたいです。', status: 'new', appliedAt: Date.now() - 86400000 * 1 },
+        { id: uid('a'), name: '鈴木 里奈', jobIdx: 0, email: 'suzuki@example.com', tel: '070-4444-5555', msg: '未経験ですが、おもてなしを学びたいです。', status: 'screening', appliedAt: Date.now() - 86400000 * 3 },
+      ]
+    },
+    {
+      id: uid('s'), name: '山あかり温泉 花笑み', area: '東北', color: '#A82020',
+      copy: '八幡平の麓、源泉かけ流しの湯宿。四季折々の山の恵みと、スタッフの笑顔でお迎えします。',
+      status: 'published', createdAt: Date.now() - 86400000 * 40,
+      jobs: [
+        { id: uid('j'), title: '客室係（仲居）', emp: 'パート・アルバイト', salary: '時給 1,150円〜', place: '岩手県八幡平市', desc: 'お食事の配膳、客室へのご案内など。シフト相談可。', req: '未経験歓迎／シニア活躍中', status: 'open', createdAt: Date.now() - 86400000 * 30 },
+      ],
+      apps: [
+        { id: uid('a'), name: '高橋 由美', jobIdx: 0, email: 'takahashi@example.com', tel: '090-6666-7777', msg: '地元で長く働ける職場を探しています。', status: 'offer', appliedAt: Date.now() - 86400000 * 8 },
+      ]
+    },
+    {
+      id: uid('s'), name: '京町家 楓庵', area: '近畿', color: '#7A3B6E',
+      copy: '築120年の京町家をリノベーションした一棟貸しの宿。国内外のお客様を京都らしいしつらえでお迎えします。',
+      status: 'draft', createdAt: Date.now() - 86400000 * 3,
+      jobs: [], apps: []
+    },
+  ]};
+  save();
+}
+
+/* ---------- helpers ---------- */
+function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
+function esc(s) { return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initials(name) { return (name||'?').trim().charAt(0); }
+function fmtDate(ts) { const d = new Date(ts); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`; }
+function relDate(ts) {
+  const diff = Date.now() - ts, day = 86400000;
+  if (diff < day) return '今日';
+  if (diff < day*2) return '昨日';
+  if (diff < day*7) return Math.floor(diff/day) + '日前';
+  return fmtDate(ts);
+}
+function getSite(id) { return state.sites.find(s => s.id === id); }
+function allApps() {
+  const out = [];
+  state.sites.forEach(s => s.apps.forEach((a, i) => out.push({ ...a, site: s, job: s.jobs[a.jobIdx] })));
+  return out;
+}
+function totals() {
+  let jobs = 0, openJobs = 0, apps = 0, newApps = 0;
+  state.sites.forEach(s => {
+    jobs += s.jobs.length;
+    openJobs += s.jobs.filter(j => j.status === 'open').length;
+    apps += s.apps.length;
+    newApps += s.apps.filter(a => a.status === 'new').length;
+  });
+  return {
+    sites: state.sites.length,
+    published: state.sites.filter(s => s.status === 'published').length,
+    jobs, openJobs, apps, newApps
+  };
+}
+
+/* ---------- toast ---------- */
+function toast(msg) {
+  const t = el(`<div class="toast"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>${esc(msg)}</span></div>`);
+  document.getElementById('toastWrap').appendChild(t);
+  setTimeout(() => { t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 2600);
+}
+
+/* ============================================================
+   ROUTER / RENDER
+   ============================================================ */
+function setView(v, opts={}) {
+  view = v;
+  if (opts.siteId !== undefined) currentSiteId = opts.siteId;
+  if (opts.tab) currentTab = opts.tab;
+  render();
+  document.querySelector('.main').scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+
+function render() {
+  // nav active
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.view === view || (view==='siteDetail' && n.dataset.view==='sites'));
+  });
+  // badges
+  const t = totals();
+  document.getElementById('badge-sites').textContent = t.sites;
+  document.getElementById('badge-jobs').textContent = t.openJobs;
+  document.getElementById('badge-apps').textContent = t.newApps;
+
+  const c = document.getElementById('content');
+  const titles = {
+    dashboard: ['ダッシュボード','採用活動の全体状況'],
+    sites: ['採用サイト','施設ごとの採用ページを管理'],
+    jobs: ['求人','全施設の求人を横断管理'],
+    applicants: ['応募者','選考ステータスの管理'],
+    settings: ['設定','データ管理'],
+    siteDetail: ['採用サイト詳細',''],
+  };
+  const tt = titles[view] || ['',''];
+  document.getElementById('topTitle').textContent = tt[0];
+  document.getElementById('topSub').textContent = tt[1];
+
+  if (view === 'dashboard') c.innerHTML = viewDashboard();
+  else if (view === 'sites') c.innerHTML = viewSites();
+  else if (view === 'jobs') c.innerHTML = viewJobs();
+  else if (view === 'applicants') c.innerHTML = viewApplicants();
+  else if (view === 'settings') c.innerHTML = viewSettings();
+  else if (view === 'siteDetail') c.innerHTML = viewSiteDetail();
+
+  bindDynamic();
+}
+
+/* ---------- DASHBOARD ---------- */
+function viewDashboard() {
+  const t = totals();
+  const recent = allApps().sort((a,b) => b.appliedAt - a.appliedAt).slice(0, 6);
+  const topSites = [...state.sites].sort((a,b)=>b.apps.length - a.apps.length).slice(0,4);
+
+  return `
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">採用サイト</div><div class="kpi-value">${t.sites}<small>件</small></div><div class="kpi-foot"><b>${t.published}</b> 件が公開中</div></div>
+    <div class="kpi"><div class="kpi-label">公開中の求人</div><div class="kpi-value">${t.openJobs}<small>件</small></div><div class="kpi-foot">全 ${t.jobs} 件のうち</div></div>
+    <div class="kpi"><div class="kpi-label">応募者数（累計）</div><div class="kpi-value">${t.apps}<small>名</small></div><div class="kpi-foot">選考中を含む</div></div>
+    <div class="kpi"><div class="kpi-label">未対応の新規応募</div><div class="kpi-value" style="color:${t.newApps? 'var(--red)':'var(--navy)'}">${t.newApps}<small>名</small></div><div class="kpi-foot">${t.newApps? '確認が必要です':'すべて対応済み'}</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h3>最近の応募</h3><div class="sub">新しい応募順</div></div>
+        <button class="btn btn-ghost btn-sm" data-nav="applicants">すべて見る →</button>
+      </div>
+      <div class="panel-body" style="padding-bottom:14px;">
+        ${recent.length ? `<table class="tbl"><tbody>
+          ${recent.map(a => `
+            <tr class="clickable" data-app="${a.id}" data-appsite="${a.site.id}">
+              <td style="width:44px;"><div class="avatar" style="background:${a.site.color}">${esc(initials(a.name))}</div></td>
+              <td><div class="strong">${esc(a.name)}</div><div style="font-size:11px;color:var(--gray);margin-top:2px;">${esc(a.site.name)}</div></td>
+              <td style="font-size:12px;color:var(--gray)">${a.job ? esc(a.job.title) : '—'}</td>
+              <td>${statusBadge(a.status)}</td>
+              <td style="text-align:right;font-size:11px;color:var(--gold);white-space:nowrap;">${relDate(a.appliedAt)}</td>
+            </tr>`).join('')}
+        </tbody></table>` : emptyMini('まだ応募がありません')}
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>サイト別 応募状況</h3><div class="sub">応募の多い順</div></div></div>
+      <div class="panel-body" style="padding:16px 22px 20px;">
+        ${topSites.map(s => {
+          const max = Math.max(1, ...state.sites.map(x=>x.apps.length));
+          const pct = Math.round(s.apps.length / max * 100);
+          return `
+          <div style="margin-bottom:16px;cursor:pointer" data-site="${s.id}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+              <span style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:3px;background:${s.color}"></span>${esc(s.name)}</span>
+              <span style="font-size:12px;color:var(--gray)">${s.apps.length}名</span>
+            </div>
+            <div style="height:6px;background:var(--light);border-radius:20px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:20px;"></div></div>
+          </div>`;
+        }).join('') || emptyMini('サイトがありません')}
+      </div>
+    </div>
+  </div>`;
+}
+function emptyMini(msg) { return `<div style="text-align:center;padding:40px 0;color:var(--gray);font-size:13px;">${esc(msg)}</div>`; }
+function statusBadge(st) { const s = STATUS[st]; return `<span class="badge ${s.cls}"><span class="dot"></span>${s.label}</span>`; }
+function siteStatusBadge(st) { const s = SITE_STATUS[st]; return `<span class="badge ${s.cls}"><span class="dot"></span>${s.label}</span>`; }
+
+/* ---------- SITES ---------- */
+let siteFilter = 'all';
+function viewSites() {
+  let sites = state.sites;
+  if (siteFilter !== 'all') sites = sites.filter(s => s.status === siteFilter);
+  if (searchTerm) sites = sites.filter(s => (s.name + s.area + s.copy).toLowerCase().includes(searchTerm));
+
+  return `
+  <div class="filters">
+    ${['all','published','draft','closed'].map(f => `<button class="chip ${siteFilter===f?'active':''}" data-sitefilter="${f}">${f==='all'?'すべて':SITE_STATUS[f].label}</button>`).join('')}
+    <button class="btn btn-primary btn-sm" style="margin-left:auto" data-newsite>＋ 新しい採用サイト</button>
+  </div>
+  ${sites.length ? `<div class="site-grid">${sites.map(siteCard).join('')}</div>` : `
+    <div class="empty">
+      <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+      <h4>採用サイトがありません</h4>
+      <p>施設ごとの採用ページを作成して、求人の掲載と応募者管理を始めましょう。</p>
+      <button class="btn btn-primary" data-newsite>＋ 最初の採用サイトを作成</button>
+    </div>`}`;
+}
+function siteCard(s) {
+  const openJobs = s.jobs.filter(j => j.status === 'open').length;
+  const newApps = s.apps.filter(a => a.status === 'new').length;
+  return `
+  <div class="site-card" data-site="${s.id}">
+    <div class="site-card-top">
+      <div class="avatar" style="background:${s.color}">${esc(initials(s.name))}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="site-card-name">${esc(s.name)}</div>
+        <div class="site-card-area">${esc(s.area)}</div>
+      </div>
+      ${siteStatusBadge(s.status)}
+    </div>
+    <div class="site-card-copy">${esc(s.copy).slice(0,58)}${s.copy.length>58?'…':''}</div>
+    <div class="site-card-stats">
+      <div class="site-card-stat"><div class="n">${openJobs}</div><div class="l">公開中の求人</div></div>
+      <div class="site-card-stat"><div class="n">${s.apps.length}</div><div class="l">応募者${newApps?` <span style="color:var(--red)">(新${newApps})</span>`:''}</div></div>
+    </div>
+  </div>`;
+}
+
+/* ---------- JOBS (cross-site) ---------- */
+function viewJobs() {
+  const rows = [];
+  state.sites.forEach(s => s.jobs.forEach((j, i) => rows.push({ job: j, site: s })));
+  let filtered = rows;
+  if (searchTerm) filtered = rows.filter(r => (r.job.title + r.site.name + r.job.emp + r.job.place).toLowerCase().includes(searchTerm));
+
+  if (!rows.length) return `<div class="empty">
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    <h4>求人がありません</h4><p>採用サイトを開いて求人を追加してください。</p>
+    <button class="btn btn-primary" data-nav="sites">採用サイト一覧へ</button></div>`;
+
+  return `<div class="panel"><div class="panel-head"><div><h3>求人一覧</h3><div class="sub">全 ${rows.length} 件</div></div></div>
+  <div class="panel-body" style="padding-bottom:10px;">
+  <table class="tbl"><thead><tr><th>求人</th><th>施設</th><th>雇用形態</th><th>給与</th><th>状態</th><th style="text-align:right">応募</th></tr></thead>
+  <tbody>${filtered.map(r => {
+    const cnt = r.site.apps.filter(a => r.site.jobs[a.jobIdx] === r.job).length;
+    return `<tr class="clickable" data-site="${r.site.id}" data-tab="jobs">
+      <td class="strong">${esc(r.job.title)}</td>
+      <td><div class="cell-facility"><div class="avatar" style="width:30px;height:30px;flex-basis:30px;font-size:14px;background:${r.site.color}">${esc(initials(r.site.name))}</div><div class="meta"><div class="nm" style="font-size:12.5px">${esc(r.site.name)}</div></div></div></td>
+      <td style="font-size:12px;color:var(--gray)">${esc(r.job.emp)}</td>
+      <td style="font-size:12px">${esc(r.job.salary)}</td>
+      <td>${r.job.status==='open'?'<span class="badge b-open"><span class="dot"></span>募集中</span>':'<span class="badge b-closed"><span class="dot"></span>締切</span>'}</td>
+      <td style="text-align:right;font-weight:700">${cnt}</td>
+    </tr>`;
+  }).join('')}</tbody></table></div></div>`;
+}
+
+/* ---------- APPLICANTS (global) ---------- */
+let appSiteFilter = 'all';
+function viewApplicants() {
+  let apps = allApps();
+  if (appSiteFilter !== 'all') apps = apps.filter(a => a.site.id === appSiteFilter);
+  if (searchTerm) apps = apps.filter(a => (a.name + a.site.name + (a.job?a.job.title:'')).toLowerCase().includes(searchTerm));
+
+  const cols = STATUS_ORDER.map(st => ({ st, items: apps.filter(a => a.status === st) }));
+
+  return `
+  <div class="filters">
+    <button class="chip ${appSiteFilter==='all'?'active':''}" data-appfilter="all">すべての施設</button>
+    ${state.sites.map(s => `<button class="chip ${appSiteFilter===s.id?'active':''}" data-appfilter="${s.id}">${esc(s.name)}</button>`).join('')}
+  </div>
+  ${apps.length ? `<div class="pipeline">
+    ${cols.map(col => `
+      <div class="pipe-col">
+        <div class="pipe-col-head"><span class="t">${statusBadge(col.st)}</span><span class="c">${col.items.length}</span></div>
+        ${col.items.length ? col.items.map(a => `
+          <div class="pipe-card" data-app="${a.id}" data-appsite="${a.site.id}">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><div class="avatar" style="width:26px;height:26px;flex-basis:26px;font-size:12px;border-radius:7px;background:${a.site.color}">${esc(initials(a.name))}</div><span class="nm">${esc(a.name)}</span></div>
+            <div class="jb">${esc(a.site.name)}${a.job? ' ・ '+esc(a.job.title):''}</div>
+            <div class="dt">${relDate(a.appliedAt)}</div>
+          </div>`).join('') : '<div class="pipe-empty">—</div>'}
+      </div>`).join('')}
+  </div>` : `<div class="empty"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h4>応募者がいません</h4><p>公開中の採用サイトから応募が入るとここに表示されます。</p></div>`}`;
+}
+
+/* ---------- SITE DETAIL ---------- */
+function viewSiteDetail() {
+  const s = getSite(currentSiteId);
+  if (!s) { setView('sites'); return ''; }
+  const openJobs = s.jobs.filter(j => j.status==='open').length;
+
+  const tabsHtml = `
+  <div class="tabs">
+    <button class="tab ${currentTab==='jobs'?'active':''}" data-stab="jobs">求人 <span class="cnt">${s.jobs.length}</span></button>
+    <button class="tab ${currentTab==='apps'?'active':''}" data-stab="apps">応募者 <span class="cnt">${s.apps.length}</span></button>
+    <button class="tab ${currentTab==='preview'?'active':''}" data-stab="preview">公開ページ プレビュー</button>
+  </div>`;
+
+  let body = '';
+  if (currentTab === 'jobs') {
+    body = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <button class="btn btn-primary btn-sm" data-newjob="${s.id}">＋ 求人を追加</button>
+    </div>
+    ${s.jobs.length ? s.jobs.map((j, i) => {
+      const cnt = s.apps.filter(a => a.jobIdx === i).length;
+      return `<div class="job-row">
+        <div class="jinfo">
+          <div class="jtitle">${esc(j.title)}</div>
+          <div class="job-tags">
+            <span class="job-tag">${esc(j.emp)}</span>
+            <span class="job-tag salary">${esc(j.salary)}</span>
+            <span class="job-tag">${esc(j.place)}</span>
+            ${j.status==='open'?'<span class="badge b-open" style="font-size:10px"><span class="dot"></span>募集中</span>':'<span class="badge b-closed" style="font-size:10px"><span class="dot"></span>締切</span>'}
+          </div>
+        </div>
+        <div class="jstat">
+          <div class="japps"><div class="n">${cnt}</div><div class="l">応募</div></div>
+          <button class="btn btn-outline btn-sm" data-editjob="${s.id}:${i}">編集</button>
+          <button class="btn btn-ghost btn-sm" data-deljob="${s.id}:${i}" title="削除">✕</button>
+        </div>
+      </div>`;
+    }).join('') : `<div class="empty"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><h4>求人がまだありません</h4><p>この施設の最初の求人を追加しましょう。</p><button class="btn btn-primary" data-newjob="${s.id}">＋ 求人を追加</button></div>`}`;
+  } else if (currentTab === 'apps') {
+    const cols = STATUS_ORDER.map(st => ({ st, items: s.apps.map((a,idx)=>({a,idx})).filter(o => o.a.status === st) }));
+    body = s.apps.length ? `<div class="pipeline">${cols.map(col => `
+      <div class="pipe-col">
+        <div class="pipe-col-head"><span class="t">${statusBadge(col.st)}</span><span class="c">${col.items.length}</span></div>
+        ${col.items.length ? col.items.map(o => `
+          <div class="pipe-card" data-app="${o.a.id}" data-appsite="${s.id}">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><div class="avatar" style="width:26px;height:26px;flex-basis:26px;font-size:12px;border-radius:7px;background:${s.color}">${esc(initials(o.a.name))}</div><span class="nm">${esc(o.a.name)}</span></div>
+            <div class="jb">${s.jobs[o.a.jobIdx]?esc(s.jobs[o.a.jobIdx].title):'—'}</div>
+            <div class="dt">${relDate(o.a.appliedAt)}</div>
+          </div>`).join('') : '<div class="pipe-empty">—</div>'}
+      </div>`).join('')}</div>
+      <div style="margin-top:18px;text-align:center;"><button class="btn btn-outline btn-sm" data-newapp="${s.id}">＋ 応募者を手動で追加</button></div>`
+      : `<div class="empty"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h4>応募者がいません</h4><p>公開ページから応募が入るとここに表示されます。テスト用に手動追加もできます。</p><button class="btn btn-primary" data-newapp="${s.id}">＋ 応募者を追加</button></div>`;
+  } else {
+    body = renderPublicPreview(s);
+  }
+
+  return `
+  <div class="breadcrumb"><a data-nav="sites">採用サイト</a> <span>›</span> <span>${esc(s.name)}</span></div>
+  <div class="detail-hero">
+    <div class="avatar" style="background:${s.color}">${esc(initials(s.name))}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;"><h2>${esc(s.name)}</h2>${siteStatusBadge(s.status)}</div>
+      <div class="area">${esc(s.area)}　|　求人 ${openJobs}件公開中　|　応募 ${s.apps.length}名</div>
+      <div class="copy">${esc(s.copy)}</div>
+    </div>
+    <div class="detail-hero-actions">
+      <button class="btn btn-outline btn-sm" data-editsite="${s.id}">サイト設定</button>
+      <button class="btn btn-primary btn-sm" data-newjob="${s.id}">＋ 求人追加</button>
+    </div>
+  </div>
+  ${tabsHtml}
+  ${body}`;
+}
+
+function renderPublicPreview(s) {
+  const jobs = s.jobs.filter(j => j.status === 'open');
+  return `
+  <div class="preview-frame">
+    <div class="preview-bar"><div class="dots"><span></span><span></span><span></span></div><span class="url">https://saiyo.ryokan-koshien.jp/${esc(s.id)}</span></div>
+    <div class="pub">
+      <div class="pub-hero">
+        <div class="pl">RECRUIT</div>
+        <h1>${esc(s.name)}</h1>
+        <div class="copy">${esc(s.copy)}</div>
+      </div>
+      <div class="pub-body">
+        <div class="pub-sec-title">募集職種</div>
+        <div class="pub-sec-en">POSITIONS</div>
+        ${jobs.length ? jobs.map(j => `
+          <div class="pub-job">
+            <h4>${esc(j.title)}</h4>
+            <div class="pub-tags"><span class="pub-tag">${esc(j.emp)}</span><span class="pub-tag">${esc(j.salary)}</span><span class="pub-tag">${esc(j.place)}</span></div>
+            <p>${esc(j.desc)}</p>
+            ${j.req?`<p style="margin-top:8px;"><b style="color:var(--navy)">応募資格：</b>${esc(j.req)}</p>`:''}
+          </div>`).join('') : '<p style="color:var(--gray);font-size:13px;">現在募集中の求人はありません。</p>'}
+        <div class="pub-apply">
+          <button class="btn btn-navy" data-previewapply="${s.id}">この宿に応募する</button>
+          <div style="font-size:11px;color:var(--gray);margin-top:10px;">※ プレビュー内の応募ボタンは、応募フォームの動作確認ができます</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  ${s.status !== 'published' ? `<div style="margin-top:16px;padding:14px 18px;background:rgba(199,135,31,0.1);border:1px solid rgba(199,135,31,0.3);border-radius:10px;font-size:12.5px;color:var(--warn);">このサイトは現在「${SITE_STATUS[s.status].label}」です。求職者には表示されません。公開するにはサイト設定から状態を「公開中」に変更してください。</div>` : ''}`;
+}
+
+/* ---------- SETTINGS ---------- */
+function viewSettings() {
+  const t = totals();
+  return `
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-head"><div><h3>データ管理</h3><div class="sub">この採用管理コンソールはブラウザ内（localStorage）にデータを保存します</div></div></div>
+    <div class="panel-body" style="padding:6px 22px 8px;">
+      <div class="settings-row">
+        <div class="info"><h4>データをエクスポート</h4><p>全施設・求人・応募者のデータをJSONファイルとして保存します。バックアップや他端末への移行に。</p></div>
+        <button class="btn btn-outline" data-export>JSONで書き出し</button>
+      </div>
+      <div class="settings-row">
+        <div class="info"><h4>データをインポート</h4><p>書き出したJSONファイルを読み込みます。現在のデータは置き換えられます。</p></div>
+        <button class="btn btn-outline" data-import>ファイルを読み込み</button>
+      </div>
+      <div class="settings-row">
+        <div class="info"><h4>サンプルデータで初期化</h4><p>デモ用の施設・求人・応募者データにリセットします。</p></div>
+        <button class="btn btn-outline" data-reseed>サンプルに戻す</button>
+      </div>
+      <div class="settings-row">
+        <div class="info"><h4 style="color:var(--red)">すべてのデータを削除</h4><p>登録した採用サイト・求人・応募者をすべて削除します。この操作は取り消せません。</p></div>
+        <button class="btn btn-danger" data-wipe>全データを削除</button>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div><h3>現在の登録状況</h3></div></div>
+    <div class="panel-body" style="padding:16px 22px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;">
+        <div><div style="font-family:var(--serif);font-size:30px;font-weight:900">${t.sites}</div><div style="font-size:11px;color:var(--gray)">採用サイト</div></div>
+        <div><div style="font-family:var(--serif);font-size:30px;font-weight:900">${t.jobs}</div><div style="font-size:11px;color:var(--gray)">求人</div></div>
+        <div><div style="font-family:var(--serif);font-size:30px;font-weight:900">${t.apps}</div><div style="font-size:11px;color:var(--gray)">応募者</div></div>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="importFile" accept="application/json" style="display:none">`;
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+function openModal(html) {
+  const ov = document.getElementById('overlay');
+  ov.innerHTML = html;
+  ov.classList.add('show');
+  const firstInput = ov.querySelector('input,select,textarea');
+  if (firstInput) setTimeout(()=>firstInput.focus(), 60);
+}
+function closeModal() {
+  const ov = document.getElementById('overlay');
+  ov.classList.remove('show');
+  setTimeout(()=>{ if(!ov.classList.contains('show')) ov.innerHTML=''; }, 220);
+}
+
+/* --- site form --- */
+function siteFormModal(siteId) {
+  const s = siteId ? getSite(siteId) : null;
+  const isEdit = !!s;
+  const color = s ? s.color : PALETTE[0];
+  openModal(`
+  <div class="modal">
+    <div class="modal-head"><div><h3>${isEdit?'採用サイトを編集':'採用サイトを作成'}</h3><div class="sub">${isEdit?esc(s.name):'施設ごとの採用ページを新規作成'}</div></div><button class="modal-close" data-close>×</button></div>
+    <div class="modal-body">
+      <div class="field"><label>施設名<span class="req">*</span></label><input id="f-name" value="${s?esc(s.name):''}" placeholder="例）海鳴りの宿 潮里"></div>
+      <div class="field-row">
+        <div class="field"><label>エリア<span class="req">*</span></label><select id="f-area">${AREAS.map(a=>`<option ${s&&s.area===a?'selected':''}>${a}</option>`).join('')}</select></div>
+        <div class="field"><label>公開状態</label><select id="f-status">${Object.keys(SITE_STATUS).map(k=>`<option value="${k}" ${s&&s.status===k?'selected':(!s&&k==='draft'?'selected':'')}>${SITE_STATUS[k].label}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>キャッチコピー / 施設紹介</label><textarea id="f-copy" placeholder="求職者に向けた宿の魅力を記載します">${s?esc(s.copy):''}</textarea><div class="hint">公開ページのトップに表示されます</div></div>
+      <div class="field"><label>テーマカラー</label><div class="color-swatches" id="f-colors">${PALETTE.map(p=>`<button type="button" class="color-swatch ${p===color?'sel':''}" data-color="${p}" style="background:${p}"></button>`).join('')}</div></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close>キャンセル</button>
+      <button class="btn btn-primary" data-savesite="${isEdit?s.id:''}">${isEdit?'変更を保存':'作成する'}</button>
+    </div>
+  </div>`);
+
+  let picked = color;
+  document.getElementById('f-colors').addEventListener('click', e => {
+    const b = e.target.closest('[data-color]'); if(!b) return;
+    picked = b.dataset.color;
+    document.querySelectorAll('#f-colors .color-swatch').forEach(x=>x.classList.toggle('sel', x===b));
+  });
+  document.querySelector('[data-savesite]').addEventListener('click', function() {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { toast('施設名を入力してください'); document.getElementById('f-name').focus(); return; }
+    const data = {
+      name, area: document.getElementById('f-area').value,
+      status: document.getElementById('f-status').value,
+      copy: document.getElementById('f-copy').value.trim(), color: picked,
+    };
+    if (isEdit) { Object.assign(s, data); toast('採用サイトを更新しました'); }
+    else {
+      const ns = { id: uid('s'), ...data, createdAt: Date.now(), jobs: [], apps: [] };
+      state.sites.unshift(ns); currentSiteId = ns.id; toast('採用サイトを作成しました');
+    }
+    save(); closeModal();
+    if (isEdit) render(); else setView('siteDetail', { tab: 'jobs' });
+  });
+}
+
+/* --- job form --- */
+function jobFormModal(siteId, jobIdx) {
+  const s = getSite(siteId); if (!s) return;
+  const isEdit = jobIdx != null && jobIdx !== '';
+  const j = isEdit ? s.jobs[jobIdx] : null;
+  openModal(`
+  <div class="modal">
+    <div class="modal-head"><div><h3>${isEdit?'求人を編集':'求人を追加'}</h3><div class="sub">${esc(s.name)}</div></div><button class="modal-close" data-close>×</button></div>
+    <div class="modal-body">
+      <div class="field"><label>職種名<span class="req">*</span></label><input id="j-title" value="${j?esc(j.title):''}" placeholder="例）フロント・接客スタッフ"></div>
+      <div class="field-row">
+        <div class="field"><label>雇用形態</label><select id="j-emp">${EMP_TYPES.map(e=>`<option ${j&&j.emp===e?'selected':''}>${e}</option>`).join('')}</select></div>
+        <div class="field"><label>募集状態</label><select id="j-status"><option value="open" ${!j||j.status==='open'?'selected':''}>募集中</option><option value="closed" ${j&&j.status==='closed'?'selected':''}>締切</option></select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>給与</label><input id="j-salary" value="${j?esc(j.salary):''}" placeholder="例）月給 23〜28万円"></div>
+        <div class="field"><label>勤務地</label><input id="j-place" value="${j?esc(j.place):''}" placeholder="例）静岡県沼津市"></div>
+      </div>
+      <div class="field"><label>仕事内容</label><textarea id="j-desc" placeholder="業務内容を記載します">${j?esc(j.desc):''}</textarea></div>
+      <div class="field"><label>応募資格</label><input id="j-req" value="${j?esc(j.req):''}" placeholder="例）未経験可／おもてなしに興味のある方"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close>キャンセル</button>
+      <button class="btn btn-primary" data-savejob>${isEdit?'変更を保存':'追加する'}</button>
+    </div>
+  </div>`);
+
+  document.querySelector('[data-savejob]').addEventListener('click', function() {
+    const title = document.getElementById('j-title').value.trim();
+    if (!title) { toast('職種名を入力してください'); return; }
+    const data = {
+      title, emp: document.getElementById('j-emp').value, status: document.getElementById('j-status').value,
+      salary: document.getElementById('j-salary').value.trim() || '応相談',
+      place: document.getElementById('j-place').value.trim() || s.area,
+      desc: document.getElementById('j-desc').value.trim(), req: document.getElementById('j-req').value.trim(),
+    };
+    if (isEdit) { Object.assign(j, data); toast('求人を更新しました'); }
+    else { s.jobs.push({ id: uid('j'), ...data, createdAt: Date.now() }); toast('求人を追加しました'); }
+    save(); closeModal(); render();
+  });
+}
+
+/* --- applicant detail / status --- */
+function appDetailModal(siteId, appId) {
+  const s = getSite(siteId); if (!s) return;
+  const a = s.apps.find(x => x.id === appId); if (!a) return;
+  const job = s.jobs[a.jobIdx];
+  openModal(`
+  <div class="modal">
+    <div class="modal-head"><div><h3>${esc(a.name)}</h3><div class="sub">${esc(s.name)}${job? ' ・ '+esc(job.title):''}</div></div><button class="modal-close" data-close>×</button></div>
+    <div class="modal-body">
+      <div class="field"><label>選考ステータス</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="a-status">
+          ${STATUS_ORDER.map(st=>`<button type="button" class="chip ${a.status===st?'active':''}" data-setstatus="${st}">${STATUS[st].label}</button>`).join('')}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;">
+        <div><div style="font-size:11px;color:var(--gray);letter-spacing:0.08em;margin-bottom:4px;">メール</div><div style="font-size:13.5px">${esc(a.email||'—')}</div></div>
+        <div><div style="font-size:11px;color:var(--gray);letter-spacing:0.08em;margin-bottom:4px;">電話</div><div style="font-size:13.5px">${esc(a.tel||'—')}</div></div>
+        <div><div style="font-size:11px;color:var(--gray);letter-spacing:0.08em;margin-bottom:4px;">応募求人</div><div style="font-size:13.5px">${job?esc(job.title):'—'}</div></div>
+        <div><div style="font-size:11px;color:var(--gray);letter-spacing:0.08em;margin-bottom:4px;">応募日</div><div style="font-size:13.5px">${fmtDate(a.appliedAt)}</div></div>
+      </div>
+      <div class="field"><label>応募メッセージ</label><div style="background:var(--white);border:1px solid var(--line);border-radius:8px;padding:14px;font-size:13px;line-height:1.9;color:var(--navy);min-height:60px;">${esc(a.msg)||'<span style="color:var(--gray)">（メッセージなし）</span>'}</div></div>
+      <div class="field"><label>選考メモ</label><textarea id="a-memo" placeholder="面接の所感などを記録">${a.memo?esc(a.memo):''}</textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" data-delapp="${s.id}:${a.id}">応募を削除</button>
+      <button class="btn btn-primary" data-saveapp="${s.id}:${a.id}">保存して閉じる</button>
+    </div>
+  </div>`);
+
+  let picked = a.status;
+  document.getElementById('a-status').addEventListener('click', e => {
+    const b = e.target.closest('[data-setstatus]'); if(!b) return;
+    picked = b.dataset.setstatus;
+    document.querySelectorAll('#a-status .chip').forEach(x=>x.classList.toggle('active', x===b));
+  });
+  document.querySelector('[data-saveapp]').addEventListener('click', () => {
+    a.status = picked; a.memo = document.getElementById('a-memo').value.trim();
+    save(); closeModal(); render(); toast('応募者情報を更新しました');
+  });
+  document.querySelector('[data-delapp]').addEventListener('click', () => {
+    if (confirm('この応募者を削除しますか？')) {
+      s.apps = s.apps.filter(x => x.id !== a.id);
+      save(); closeModal(); render(); toast('応募者を削除しました');
+    }
+  });
+}
+
+/* --- manual applicant add / public apply form --- */
+function applyFormModal(siteId, opts={}) {
+  const s = getSite(siteId); if (!s) return;
+  const openJobs = s.jobs.map((j,i)=>({j,i})).filter(o => o.j.status==='open');
+  const jobOptions = (opts.publicMode ? openJobs : s.jobs.map((j,i)=>({j,i})));
+  openModal(`
+  <div class="modal">
+    <div class="modal-head"><div><h3>${opts.publicMode?'この宿に応募する':'応募者を追加'}</h3><div class="sub">${esc(s.name)}</div></div><button class="modal-close" data-close>×</button></div>
+    <div class="modal-body">
+      ${opts.publicMode?'<div style="background:var(--white);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--gray);margin-bottom:18px;line-height:1.7;">これは公開応募フォームのプレビューです。送信すると応募者一覧に追加されます。</div>':''}
+      <div class="field"><label>お名前<span class="req">*</span></label><input id="p-name" placeholder="例）山田 太郎"></div>
+      <div class="field"><label>応募する求人<span class="req">*</span></label><select id="p-job">${jobOptions.length?jobOptions.map(o=>`<option value="${o.i}">${esc(o.j.title)}</option>`).join(''):'<option value="">（募集中の求人がありません）</option>'}</select></div>
+      <div class="field-row">
+        <div class="field"><label>メールアドレス</label><input id="p-email" placeholder="mail@example.com"></div>
+        <div class="field"><label>電話番号</label><input id="p-tel" placeholder="090-0000-0000"></div>
+      </div>
+      <div class="field"><label>志望動機 / メッセージ</label><textarea id="p-msg" placeholder="ご自身の経験や、この宿で働きたい理由をお聞かせください"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close>キャンセル</button>
+      <button class="btn btn-primary" data-submitapp>${opts.publicMode?'応募を送信':'追加する'}</button>
+    </div>
+  </div>`);
+
+  document.querySelector('[data-submitapp]').addEventListener('click', () => {
+    const name = document.getElementById('p-name').value.trim();
+    const jobVal = document.getElementById('p-job').value;
+    if (!name) { toast('お名前を入力してください'); return; }
+    if (jobVal === '') { toast('応募できる求人がありません'); return; }
+    s.apps.unshift({
+      id: uid('a'), name, jobIdx: parseInt(jobVal,10),
+      email: document.getElementById('p-email').value.trim(),
+      tel: document.getElementById('p-tel').value.trim(),
+      msg: document.getElementById('p-msg').value.trim(),
+      status: 'new', appliedAt: Date.now(),
+    });
+    save(); closeModal();
+    if (opts.publicMode) { toast('応募を受け付けました。ありがとうございます！'); }
+    else { toast('応募者を追加しました'); }
+    render();
+  });
+}
+
+/* ============================================================
+   EVENT BINDING
+   ============================================================ */
+function bindStatic() {
+  // sidebar nav
+  document.getElementById('nav').addEventListener('click', e => {
+    const b = e.target.closest('.nav-item'); if(!b) return;
+    setView(b.dataset.view);
+    document.getElementById('sidebar').classList.remove('open');
+    document.querySelector('.scrim')?.remove();
+  });
+  // quick add
+  document.getElementById('quickAdd').addEventListener('click', () => siteFormModal(null));
+  // global search
+  document.getElementById('globalSearch').addEventListener('input', e => {
+    searchTerm = e.target.value.trim().toLowerCase();
+    if (['sites','jobs','applicants'].includes(view)) render();
+    else if (searchTerm) setView('sites');
+  });
+  // overlay close
+  document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target.id === 'overlay' || e.target.closest('[data-close]')) closeModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  // mobile menu
+  document.getElementById('menuBtn').addEventListener('click', () => {
+    const sb = document.getElementById('sidebar');
+    sb.classList.add('open');
+    const scrim = el('<div class="scrim"></div>');
+    scrim.addEventListener('click', () => { sb.classList.remove('open'); scrim.remove(); });
+    document.body.appendChild(scrim);
+  });
+}
+
+function bindDynamic() {
+  const c = document.getElementById('content');
+
+  c.querySelectorAll('[data-nav]').forEach(b => b.onclick = () => setView(b.dataset.nav));
+  c.querySelectorAll('[data-site]').forEach(b => b.onclick = (e) => {
+    if (e.target.closest('[data-editsite],[data-newjob],[data-editjob],[data-deljob]')) return;
+    setView('siteDetail', { siteId: b.dataset.site, tab: b.dataset.tab || 'jobs' });
+  });
+  c.querySelectorAll('[data-sitefilter]').forEach(b => b.onclick = () => { siteFilter = b.dataset.sitefilter; render(); });
+  c.querySelectorAll('[data-appfilter]').forEach(b => b.onclick = () => { appSiteFilter = b.dataset.appfilter; render(); });
+  c.querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { currentTab = b.dataset.stab; render(); });
+  c.querySelectorAll('[data-newsite]').forEach(b => b.onclick = () => siteFormModal(null));
+  c.querySelectorAll('[data-editsite]').forEach(b => b.onclick = (e) => { e.stopPropagation(); siteFormModal(b.dataset.editsite); });
+  c.querySelectorAll('[data-newjob]').forEach(b => b.onclick = (e) => { e.stopPropagation(); jobFormModal(b.dataset.newjob, null); });
+  c.querySelectorAll('[data-editjob]').forEach(b => b.onclick = (e) => { e.stopPropagation(); const [sid,idx]=b.dataset.editjob.split(':'); jobFormModal(sid, parseInt(idx,10)); });
+  c.querySelectorAll('[data-deljob]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const [sid,idx]=b.dataset.deljob.split(':'); const s=getSite(sid); const i=parseInt(idx,10);
+    if (confirm(`求人「${s.jobs[i].title}」を削除しますか？`)) {
+      s.jobs.splice(i,1);
+      // reindex applicants
+      s.apps = s.apps.filter(a => a.jobIdx !== i).map(a => ({ ...a, jobIdx: a.jobIdx > i ? a.jobIdx-1 : a.jobIdx }));
+      save(); render(); toast('求人を削除しました');
+    }
+  });
+  c.querySelectorAll('[data-app]').forEach(b => b.onclick = () => appDetailModal(b.dataset.appsite, b.dataset.app));
+  c.querySelectorAll('[data-newapp]').forEach(b => b.onclick = () => applyFormModal(b.dataset.newapp, {}));
+  c.querySelectorAll('[data-previewapply]').forEach(b => b.onclick = () => applyFormModal(b.dataset.previewapply, { publicMode:true }));
+
+  // settings
+  c.querySelector('[data-export]')?.addEventListener('click', doExport);
+  c.querySelector('[data-import]')?.addEventListener('click', () => document.getElementById('importFile').click());
+  c.querySelector('#importFile')?.addEventListener('change', doImport);
+  c.querySelector('[data-reseed]')?.addEventListener('click', () => { if(confirm('サンプルデータに戻します。現在のデータは失われます。よろしいですか？')){ seed(); render(); toast('サンプルデータに初期化しました'); }});
+  c.querySelector('[data-wipe]')?.addEventListener('click', () => { if(confirm('すべてのデータを削除します。取り消せません。よろしいですか？')){ state={sites:[],seq:1}; save(); setView('dashboard'); toast('全データを削除しました'); }});
+}
+
+function doExport() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `ryokan-saiyo-${fmtDate(Date.now()).replace(/\./g,'')}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('データを書き出しました');
+}
+function doImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data.sites || !Array.isArray(data.sites)) throw new Error('形式が不正です');
+      state = data; if (!state.seq) state.seq = 1;
+      save(); setView('dashboard'); toast('データを読み込みました');
+    } catch(err) { toast('読み込みに失敗しました：' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+if (!load()) seed();
+bindStatic();
+render();
+</script>
+</body>
+</html>
