@@ -1,3 +1,8 @@
+# 秘密情報（サーバーにのみ設置。絶対にコミットしない）
+api/config.secret.php
+config.secret.php
+**/config.secret.php
+
 # SQLite データベース（サーバー上で自動生成）
 data/*.sqlite
 data/*.sqlite-journal

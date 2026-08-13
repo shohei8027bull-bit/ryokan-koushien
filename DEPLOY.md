@@ -24,7 +24,8 @@ FTP などで、公開フォルダ（`public_html` / `www` など）へ次をア
 ├── .htaccess             ← ルーティング設定
 ├── api/                  ← PHPバックエンド一式
 │   ├── index.php
-│   ├── config.php
+│   ├── config.php            ← 秘密情報は書かない（config.secret.phpを読む）
+│   ├── config.secret.php     ← ★DB接続情報など（サーバーにのみ設置・Git管理外）
 │   ├── db.php
 │   ├── connectors.php
 │   └── .htaccess
@@ -34,33 +35,48 @@ FTP などで、公開フォルダ（`public_html` / `www` など）へ次をア
 
 > `server/`（Node.js版）はローカル検証用です。共用サーバーには不要なのでアップロード不要です。
 
-## 3. 設定（`api/config.php`）
+## 3. 設定（`api/config.secret.php`）
 
-最低限、次を確認・編集してください。
+DBパスワード等の秘密情報は `api/config.php` には書きません。
+**`api/config.secret.php`（サーバーにのみ設置・Git管理外）** に記述します。
+既存の `ryokan-php/config.php` と同じ定数名・同じ運用です。
 
-1. **`admin_token`** … 公開サーバーでは必ず推測されにくい文字列を設定してください。
-   設定すると、コンソール初回アクセス時にトークン入力を求められます（応募フォームには不要）。
+1. `api/config.secret.php.example` をコピーして `api/config.secret.php` を作成
+   （※ 本プロジェクトでは、ひふみ旅館の共用サーバーの接続情報を記入した
+   `config.secret.php` を別途お渡ししています。それをそのまま `api/` に置けばOKです）。
+2. 内容（共用サーバーの MySQL 情報）:
    ```php
-   'admin_token' => 'ここに長いランダム文字列',
+   <?php
+   define('DB_HOST', 'sddb........cgidb');  // データベースホスト
+   define('DB_NAME', 'sddb........');        // データベース名
+   define('DB_USER', 'sd_dba_......');       // ユーザー名
+   define('DB_PASS', '********');            // パスワード
+   define('SAIYO_ADMIN_TOKEN', '長いランダム文字列'); // 管理画面の保護トークン
    ```
-2. **データベース** … 既定は SQLite（設定不要）。MySQL を使う場合のみ
-   `'driver' => 'mysql'` にして `mysql` の接続情報を記入してください。
+3. `config.secret.php` があれば自動的に **MySQL** に接続します（無ければローカル検証用に SQLite）。
+4. `SAIYO_ADMIN_TOKEN` を設定すると、コンソール初回アクセス時にトークン入力を求められます
+   （応募フォーム `apply.html` には不要）。公開サーバーでは必ず設定してください。
 
-## 4. `data/` フォルダの書き込み権限
+> テーブルは `saiyo_` 接頭辞（`saiyo_channels` 等）で作成されるため、
+> 既存の「Ryokan Price」等と同じデータベースを共用しても衝突しません。
 
-SQLite を使う場合、`data/` フォルダに書き込み権限が必要です。
-FTPソフトのパーミッション変更で `data/` を **707**（または 777）に設定してください。
-（初回アクセス時に `data/saiyo.sqlite` が自動生成されます）
+## 4. `data/` フォルダの書き込み権限（MySQL利用時は不要）
+
+ひふみ旅館の共用サーバーは **MySQL** を使うため、通常 `data/` の設定は不要です。
+（ローカル検証で SQLite を使う場合のみ、`data/` を書き込み可(707/777)にしてください。
+初回アクセス時に `data/saiyo.sqlite` が自動生成されます）
 
 ## 5. 動作確認
 
 ブラウザで次を開きます（`https://あなたのドメイン/` を読み替えてください）。
 
-| 用途 | URL |
+| 用途 | URL（ひふみ旅館ドメインの例） |
 |---|---|
-| 採用管理コンソール | `https://あなたのドメイン/saiyo-kanri.html` |
-| 応募フォーム | `https://あなたのドメイン/apply.html` |
-| 動作確認(API) | `https://あなたのドメイン/api/health` |
+| 採用管理コンソール | `https://hifumi-kyoto.jp/saiyo-kanri.html` |
+| 応募フォーム | `https://hifumi-kyoto.jp/apply.html` |
+| 動作確認(API) | `https://hifumi-kyoto.jp/api/health` |
+
+> ※ サブフォルダ（例 `https://hifumi-kyoto.jp/saiyo/`）に設置しても動作します。
 
 - コンソール右上が「**サーバー接続中**」になれば成功です。
 - `api/health` が `{"ok":true,...}` を返せばAPIは正常です。

@@ -1,12 +1,18 @@
 <?php
 /* ============================================================
    ひふみ旅館 採用一元管理システム — 永続化レイヤ（PDO）
-   SQLite / MySQL の両対応。共用サーバーでそのまま動作します。
+   SQLite / MySQL の両対応。共用サーバー(MySQL)でそのまま動作します。
+   テーブルは saiyo_ 接頭辞（既存アプリとの共存のため）。
    ============================================================ */
 
 class DB {
   private $pdo;
   private $driver;
+  // テーブル名（既存DBと共存できるよう接頭辞つき）
+  private $tMeta = 'saiyo_meta';
+  private $tCh   = 'saiyo_channels';
+  private $tJob  = 'saiyo_jobs';
+  private $tApp  = 'saiyo_applicants';
 
   function __construct($cfg) {
     $this->driver = $cfg['driver'];
@@ -16,6 +22,7 @@ class DB {
       $this->pdo = new PDO($dsn, $m['user'], $m['pass'], [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
       ]);
     } else {
       $path = $cfg['sqlite_path'];
@@ -31,16 +38,17 @@ class DB {
   private function migrate() {
     $idType = $this->driver === 'mysql' ? 'VARCHAR(40)' : 'TEXT';
     $intType = $this->driver === 'mysql' ? 'BIGINT' : 'INTEGER';
-    $this->pdo->exec("CREATE TABLE IF NOT EXISTS meta (k $idType PRIMARY KEY, v TEXT)");
-    $this->pdo->exec("CREATE TABLE IF NOT EXISTS channels (
+    $eng = $this->driver === 'mysql' ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4' : '';
+    $this->pdo->exec("CREATE TABLE IF NOT EXISTS {$this->tMeta} (k $idType PRIMARY KEY, v TEXT)$eng");
+    $this->pdo->exec("CREATE TABLE IF NOT EXISTS {$this->tCh} (
       id $idType PRIMARY KEY, name TEXT, kind TEXT, status TEXT, cost INT,
-      color TEXT, note TEXT, connector TEXT, config TEXT, created_at $intType)");
-    $this->pdo->exec("CREATE TABLE IF NOT EXISTS jobs (
+      color TEXT, note TEXT, connector TEXT, config TEXT, created_at $intType)$eng");
+    $this->pdo->exec("CREATE TABLE IF NOT EXISTS {$this->tJob} (
       id $idType PRIMARY KEY, title TEXT, emp TEXT, salary TEXT, place TEXT,
-      descr TEXT, req TEXT, status TEXT, channel_ids TEXT, created_at $intType)");
-    $this->pdo->exec("CREATE TABLE IF NOT EXISTS applicants (
+      descr TEXT, req TEXT, status TEXT, channel_ids TEXT, created_at $intType)$eng");
+    $this->pdo->exec("CREATE TABLE IF NOT EXISTS {$this->tApp} (
       id $idType PRIMARY KEY, name TEXT, job_id $idType, channel_id $idType, email TEXT,
-      tel TEXT, msg TEXT, memo TEXT, status TEXT, source TEXT, applied_at $intType)");
+      tel TEXT, msg TEXT, memo TEXT, status TEXT, source TEXT, applied_at $intType)$eng");
   }
 
   /* ---------- id 生成 ---------- */
@@ -66,17 +74,17 @@ class DB {
   }
 
   /* ---------- 参照 ---------- */
-  function getMeta($k, $def) { $s=$this->pdo->prepare('SELECT v FROM meta WHERE k=?'); $s->execute([$k]); $r=$s->fetch(); return $r?json_decode($r['v'],true):$def; }
+  function getMeta($k, $def) { $s=$this->pdo->prepare("SELECT v FROM {$this->tMeta} WHERE k=?"); $s->execute([$k]); $r=$s->fetch(); return $r?json_decode($r['v'],true):$def; }
   function setMeta($k, $val) {
     $json = json_encode($val, JSON_UNESCAPED_UNICODE);
-    if ($this->driver === 'mysql') $sql='INSERT INTO meta(k,v) VALUES(?,?) ON DUPLICATE KEY UPDATE v=VALUES(v)';
-    else $sql='INSERT INTO meta(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v';
+    if ($this->driver === 'mysql') $sql="INSERT INTO {$this->tMeta}(k,v) VALUES(?,?) ON DUPLICATE KEY UPDATE v=VALUES(v)";
+    else $sql="INSERT INTO {$this->tMeta}(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v";
     $this->pdo->prepare($sql)->execute([$k, $json]);
   }
-  function getChannels() { return array_map([$this,'chFromRow'], $this->pdo->query('SELECT * FROM channels ORDER BY created_at ASC')->fetchAll()); }
-  function getJobs() { return array_map([$this,'jobFromRow'], $this->pdo->query('SELECT * FROM jobs ORDER BY created_at DESC')->fetchAll()); }
-  function getApplicants() { return array_map([$this,'appFromRow'], $this->pdo->query('SELECT * FROM applicants ORDER BY applied_at DESC')->fetchAll()); }
-  function getChannel($id) { $s=$this->pdo->prepare('SELECT * FROM channels WHERE id=?'); $s->execute([$id]); $r=$s->fetch(); return $r?$this->chFromRow($r):null; }
+  function getChannels() { return array_map([$this,'chFromRow'], $this->pdo->query("SELECT * FROM {$this->tCh} ORDER BY created_at ASC")->fetchAll()); }
+  function getJobs() { return array_map([$this,'jobFromRow'], $this->pdo->query("SELECT * FROM {$this->tJob} ORDER BY created_at DESC")->fetchAll()); }
+  function getApplicants() { return array_map([$this,'appFromRow'], $this->pdo->query("SELECT * FROM {$this->tApp} ORDER BY applied_at DESC")->fetchAll()); }
+  function getChannel($id) { $s=$this->pdo->prepare("SELECT * FROM {$this->tCh} WHERE id=?"); $s->execute([$id]); $r=$s->fetch(); return $r?$this->chFromRow($r):null; }
 
   function getState() {
     return ['ryokan'=>$this->getMeta('ryokan', ['name'=>'ひふみ旅館','area'=>'','copy'=>'']),
@@ -85,15 +93,15 @@ class DB {
 
   /* ---------- 書き込み ---------- */
   private function insertChannel($c) {
-    $this->pdo->prepare('INSERT INTO channels(id,name,kind,status,cost,color,note,connector,config,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')
+    $this->pdo->prepare("INSERT INTO {$this->tCh}(id,name,kind,status,cost,color,note,connector,config,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)")
       ->execute([$c['id'],$c['name'],$c['kind'],$c['status'],(int)($c['cost']??0),$c['color'],$c['note']??'',$c['connector']??'manual',json_encode($c['config']??[],JSON_UNESCAPED_UNICODE),$c['createdAt']??self::now()]);
   }
   private function insertJob($j) {
-    $this->pdo->prepare('INSERT INTO jobs(id,title,emp,salary,place,descr,req,status,channel_ids,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)')
+    $this->pdo->prepare("INSERT INTO {$this->tJob}(id,title,emp,salary,place,descr,req,status,channel_ids,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)")
       ->execute([$j['id'],$j['title'],$j['emp'],$j['salary'],$j['place'],$j['desc']??'',$j['req']??'',$j['status'],json_encode($j['channelIds']??[],JSON_UNESCAPED_UNICODE),$j['createdAt']??self::now()]);
   }
   private function insertApplicant($a) {
-    $this->pdo->prepare('INSERT INTO applicants(id,name,job_id,channel_id,email,tel,msg,memo,status,source,applied_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+    $this->pdo->prepare("INSERT INTO {$this->tApp}(id,name,job_id,channel_id,email,tel,msg,memo,status,source,applied_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)")
       ->execute([$a['id'],$a['name'],$a['jobId'],$a['channelId'],$a['email']??'',$a['tel']??'',$a['msg']??'',$a['memo']??'',$a['status']??'new',$a['source']??'',$a['appliedAt']??self::now()]);
   }
   function addApplicant($a) {
@@ -107,7 +115,7 @@ class DB {
   function replaceState($state) {
     $this->pdo->beginTransaction();
     try {
-      $this->pdo->exec('DELETE FROM channels'); $this->pdo->exec('DELETE FROM jobs'); $this->pdo->exec('DELETE FROM applicants');
+      $this->pdo->exec("DELETE FROM {$this->tCh}"); $this->pdo->exec("DELETE FROM {$this->tJob}"); $this->pdo->exec("DELETE FROM {$this->tApp}");
       foreach (($state['channels']??[]) as $c) $this->insertChannel($c);
       foreach (($state['jobs']??[]) as $j) $this->insertJob($j);
       foreach (($state['apps']??[]) as $a) $this->insertApplicant($a);
@@ -118,7 +126,7 @@ class DB {
 
   /* ---------- サンプルデータ（京都駅前・ひふみ旅館） ---------- */
   function seedIfEmpty() {
-    $n = (int) $this->pdo->query('SELECT COUNT(*) c FROM channels')->fetch()['c'];
+    $n = (int) $this->pdo->query("SELECT COUNT(*) c FROM {$this->tCh}")->fetch()['c'];
     if ($n > 0) return false;
     $this->setMeta('ryokan', ['name'=>'ひふみ旅館','area'=>'京都府・京都駅前',
       'copy'=>'京都駅から徒歩5分。国内外のお客様を和のおもてなしでお迎えする町家旅館です。スタッフの笑顔がいちばんのおもてなしです。']);

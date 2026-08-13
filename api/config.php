@@ -1,28 +1,35 @@
 <?php
 /* ============================================================
-   ひふみ旅館 採用一元管理システム — 設定ファイル
-   共用サーバーではこのファイルを編集するだけで設定できます。
+   ひふみ旅館 採用一元管理システム — 設定
+   ------------------------------------------------------------
+   ★ DBパスワード等の秘密情報はこのファイルには書きません。
+     サーバー上にのみ置く config.secret.php（Git管理外）から読み込みます。
+     （既存の ryokan-php/config.php と同じ運用・同じ定数名 DB_HOST など）
    ============================================================ */
-return [
-  // データベースの種類: 'sqlite'（設定不要・推奨） または 'mysql'
-  'driver' => getenv('SAIYO_DRIVER') ?: 'sqlite',
 
-  // 【SQLiteの場合】保存先ファイル。data/ フォルダは書き込み可(例:707/777)にしてください。
-  //  Web公開領域の外に置ける場合はそちらを推奨します。
+// サーバー限定の秘密設定を読み込む（存在すれば）
+if (is_file(__DIR__ . '/config.secret.php')) require __DIR__ . '/config.secret.php';
+
+// DB接続情報が定義されていれば MySQL、なければ SQLite（ローカル検証用）
+$hasMysql = defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER');
+
+return [
+  // 'mysql'（本番・共用サーバー） または 'sqlite'（ローカル検証）
+  'driver' => $hasMysql ? 'mysql' : (getenv('SAIYO_DRIVER') ?: 'sqlite'),
+
+  // SQLite（ローカル検証時のみ使用）
   'sqlite_path' => __DIR__ . '/../data/saiyo.sqlite',
 
-  // 【MySQLの場合】共用サーバーの管理画面で発行された値を設定してください。
+  // MySQL 接続情報（config.secret.php の定数を優先）
   'mysql' => [
-    'host'    => getenv('SAIYO_DB_HOST') ?: 'localhost',
-    'dbname'  => getenv('SAIYO_DB_NAME') ?: 'hifumi_saiyo',
-    'user'    => getenv('SAIYO_DB_USER') ?: 'dbuser',
-    'pass'    => getenv('SAIYO_DB_PASS') ?: 'dbpass',
+    'host'    => defined('DB_HOST') ? DB_HOST : (getenv('SAIYO_DB_HOST') ?: 'localhost'),
+    'dbname'  => defined('DB_NAME') ? DB_NAME : (getenv('SAIYO_DB_NAME') ?: ''),
+    'user'    => defined('DB_USER') ? DB_USER : (getenv('SAIYO_DB_USER') ?: ''),
+    'pass'    => defined('DB_PASS') ? DB_PASS : (getenv('SAIYO_DB_PASS') ?: ''),
     'charset' => 'utf8mb4',
   ],
 
-  // 管理画面(コンソール)の簡易保護トークン。
-  //  空文字なら保護なし（誰でも /api/state を読み書き可能）。
-  //  公開サーバーでは必ず推測されにくい文字列を設定してください。
-  //  設定すると、コンソール初回アクセス時にトークン入力を求められます。
-  'admin_token' => getenv('SAIYO_ADMIN_TOKEN') ?: '',
+  // 管理コンソールの保護トークン（config.secret.php で SAIYO_ADMIN_TOKEN を定義）
+  //  未設定なら保護なし（公開サーバーでは必ず設定してください）。
+  'admin_token' => defined('SAIYO_ADMIN_TOKEN') ? SAIYO_ADMIN_TOKEN : (getenv('SAIYO_ADMIN_TOKEN') ?: ''),
 ];
