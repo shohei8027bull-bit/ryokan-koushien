@@ -1,0 +1,15 @@
+# ============================================================
+#  ひふみ旅館 採用一元管理システム（共用サーバー用）
+#  /api/xxx へのアクセスを api/index.php にルーティングします。
+#  ※ mod_rewrite が使えない場合でも、フロントは
+#     api/index.php?__path=xxx の形式に自動でフォールバックします。
+# ============================================================
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^api/(.*)$ api/index.php?__path=$1 [QSA,L]
+</IfModule>
+
+# 既定ページ
+DirectoryIndex saiyo-kanri.html index.html

@@ -537,7 +537,9 @@ let searchTerm = '';
 let chFilter = 'all';
 let appChFilter = 'all';
 let apiMode = false;
+let apiStyle = 'pretty'; // 'pretty'（/api/xxx）または 'php'（api/index.php?__path=xxx）
 let pollTimer = null;
+const API_BASE = location.protocol.startsWith('http') ? location.href.replace(/[^/]*(\?.*)?(#.*)?$/, '') : 'http://localhost:8787/';
 
 /* ---------- persistence ---------- */
 function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); if (apiMode) pushState(); }
@@ -674,7 +676,9 @@ function connMeta(t) { return CONNECTORS[t] || CONNECTORS.manual; }
 function connBadge(c) { return connMeta(c.connector).auto
   ? '<span class="badge b-active" style="font-size:10px"><span class="dot"></span>自動連携</span>'
   : '<span class="badge b-paused" style="font-size:10px"><span class="dot"></span>手動</span>'; }
-function apiOrigin() { return (apiMode && location.protocol.startsWith('http')) ? location.origin : 'http://localhost:8787'; }
+function apiUrl(p) { return apiStyle === 'php' ? API_BASE + 'api/index.php?__path=' + p : API_BASE + 'api/' + p; }
+function webhookUrl(c) { return apiStyle === 'php' ? API_BASE + 'api/index.php?__path=webhooks/' + c.id : API_BASE + 'api/webhooks/' + c.id; }
+function applyPageUrl() { return API_BASE + 'apply.html'; }
 
 /* ---------- DASHBOARD ---------- */
 function viewDashboard() {
@@ -796,20 +800,21 @@ function chCard(c) {
 /* ---------- CHANNEL DETAIL ---------- */
 function renderConnPanel(c) {
   const meta = connMeta(c.connector);
-  const origin = apiOrigin();
+  const applyU = applyPageUrl();
+  const hookU = webhookUrl(c);
   let inner = '';
   if (c.connector === 'self-site') {
     inner = `<div class="ci-h">応募フォームURL（自社採用サイト）</div>
-      <div class="ci-row"><code>${origin}/apply.html</code><button class="btn btn-outline btn-sm" data-copy="${origin}/apply.html">コピー</button></div>
+      <div class="ci-row"><code>${esc(applyU)}</code><button class="btn btn-outline btn-sm" data-copy="${esc(applyU)}">コピー</button></div>
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-        <a class="btn btn-navy btn-sm" href="${origin}/apply.html" target="_blank" rel="noopener">応募フォームを開く</a>
+        <a class="btn btn-navy btn-sm" href="${esc(applyU)}" target="_blank" rel="noopener">応募フォームを開く</a>
         <button class="btn btn-outline btn-sm" data-testapply>テスト応募を送信</button>
       </div>
       <div class="hint" style="margin-top:10px">このフォームからの応募は、自動でこの媒体として選考パイプラインに追加されます（#1）。</div>`;
   } else if (meta.auto) {
     const secret = (c.config && c.config.secret) || '（未設定）';
     inner = `<div class="ci-h">Webhook 受信URL（${esc(meta.label)}）</div>
-      <div class="ci-row"><code>${origin}/api/webhooks/${esc(c.id)}</code><button class="btn btn-outline btn-sm" data-copy="${origin}/api/webhooks/${esc(c.id)}">コピー</button></div>
+      <div class="ci-row"><code>${esc(hookU)}</code><button class="btn btn-outline btn-sm" data-copy="${esc(hookU)}">コピー</button></div>
       <div class="ci-h" style="margin-top:14px">受信シークレット（x-webhook-secret ヘッダ）</div>
       <div class="ci-row"><code>${esc(secret)}</code></div>
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
@@ -1027,12 +1032,11 @@ function channelFormModal(chId) {
     const box = document.getElementById('c-conn-extra');
     const meta = connMeta(conn);
     if (!meta.auto) { box.innerHTML = `<div class="hint" style="margin:-8px 0 18px">この媒体は自動連携なし。応募は「応募者を手動追加」やCSV等で登録します。</div>`; return; }
-    const origin = apiOrigin();
     if (conn === 'self-site') {
-      box.innerHTML = `<div class="conn-info"><div class="ci-h">自社採用サイトの応募フォーム</div><div class="ci-row"><code>${origin}/apply.html</code></div><div class="hint">このURLの応募フォームから送信された応募が、自動でこの媒体として取り込まれます。</div></div>`;
+      box.innerHTML = `<div class="conn-info"><div class="ci-h">自社採用サイトの応募フォーム</div><div class="ci-row"><code>${esc(applyPageUrl())}</code></div><div class="hint">このURLの応募フォームから送信された応募が、自動でこの媒体として取り込まれます。</div></div>`;
       return;
     }
-    const url = isEdit ? `${origin}/api/webhooks/${c.id}` : '保存後に発行されます';
+    const url = isEdit ? webhookUrl(c) : '保存後に発行されます';
     box.innerHTML = `<div class="conn-info">
       <div class="ci-h">Webhook 受信URL</div>
       <div class="ci-row"><code>${esc(url)}</code></div>
@@ -1192,8 +1196,8 @@ function bindDynamic() {
   c.querySelectorAll('[data-app]').forEach(b => b.onclick = () => appDetailModal(b.dataset.app));
   c.querySelectorAll('[data-newapp]').forEach(b => b.onclick = () => appFormModal());
   c.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => { const t=b.dataset.copy; if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>toast('URLをコピーしました')).catch(()=>toast(t)); } else toast(t); });
-  c.querySelectorAll('[data-simulate]').forEach(b => b.onclick = async () => { if(!apiMode){toast('バックエンド起動時に利用できます');return;} b.disabled=true; try{ const r=await fetch('/api/channels/'+b.dataset.simulate+'/simulate',{method:'POST'}); const d=await r.json(); if(d.ok){ await refreshFromApi(true); toast('テスト応募を受信しました：'+d.applicant.name); } else toast(d.error||'受信に失敗しました'); }catch(e){ toast('通信に失敗しました'); } b.disabled=false; });
-  c.querySelector('[data-testapply]')?.addEventListener('click', async () => { if(!apiMode){toast('バックエンド起動時に利用できます');return;} try{ const r=await fetch('/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'テスト 応募者',email:'test@example.com',msg:'自社フォームからのテスト応募です'})}); const d=await r.json(); if(d.ok){ await refreshFromApi(true); toast('自社フォームからのテスト応募を受信しました'); } else toast(d.error||'失敗しました'); }catch(e){ toast('通信に失敗しました'); } });
+  c.querySelectorAll('[data-simulate]').forEach(b => b.onclick = async () => { if(!apiMode){toast('バックエンド接続時に利用できます');return;} b.disabled=true; try{ const r=await fetch(apiUrl('channels/'+b.dataset.simulate+'/simulate'),{method:'POST',headers:adminHeaders()}); const d=await r.json(); if(d.ok){ await refreshFromApi(true); toast('テスト応募を受信しました：'+d.applicant.name); } else toast(d.error||'受信に失敗しました'); }catch(e){ toast('通信に失敗しました'); } b.disabled=false; });
+  c.querySelector('[data-testapply]')?.addEventListener('click', async () => { if(!apiMode){toast('バックエンド接続時に利用できます');return;} try{ const r=await fetch(apiUrl('apply'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'テスト 応募者',email:'test@example.com',msg:'自社フォームからのテスト応募です'})}); const d=await r.json(); if(d.ok){ await refreshFromApi(true); toast('自社フォームからのテスト応募を受信しました'); } else toast(d.error||'失敗しました'); }catch(e){ toast('通信に失敗しました'); } });
 
   c.querySelector('[data-savesettings]')?.addEventListener('click', () => { state.ryokan.name=document.getElementById('set-name').value.trim()||'ひふみ旅館'; state.ryokan.area=document.getElementById('set-area').value.trim(); state.ryokan.copy=document.getElementById('set-copy').value.trim(); save(); render(); toast('基本情報を保存しました'); });
   c.querySelector('[data-export]')?.addEventListener('click', doExport);
@@ -1221,13 +1225,25 @@ function doImport(e) {
    バックエンド（server/server.js）が起動していれば自動的に接続し、
    データはサーバー（SQLite）を正とする。未起動ならローカル保存で動作。
    ============================================================ */
-async function apiGet(path) { const r = await fetch(path, { cache: 'no-store' }); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }
+function adminHeaders(extra) { const t = localStorage.getItem('hifumi_admin_token') || ''; const h = Object.assign({}, extra || {}); if (t) h['x-admin-token'] = t; return h; }
+async function promptToken() { const t = prompt('管理トークンを入力してください（サーバーの config.php で設定した値）'); if (t == null) return false; localStorage.setItem('hifumi_admin_token', t.trim()); return true; }
+async function apiGet(url) {
+  let r = await fetch(url, { cache:'no-store', headers: adminHeaders() });
+  if (r.status === 401) { if (await promptToken()) r = await fetch(url, { cache:'no-store', headers: adminHeaders() }); }
+  if (!r.ok) throw new Error('http ' + r.status); return r.json();
+}
+async function detectApi() {
+  for (const style of ['pretty','php']) {
+    try { const u = style==='php' ? API_BASE+'api/index.php?__path=health' : API_BASE+'api/health'; const r = await fetch(u, { cache:'no-store' }); if (r.ok) { apiStyle = style; return true; } } catch (e) {}
+  }
+  return false;
+}
 
 let _pushPending = false, _pushAgain = false;
 async function pushState() {
   if (_pushPending) { _pushAgain = true; return; }
   _pushPending = true;
-  try { await fetch('/api/state', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ryokan: state.ryokan, channels: state.channels, jobs: state.jobs, apps: state.apps }) }); } catch (e) {}
+  try { await fetch(apiUrl('state'), { method:'PUT', headers: adminHeaders({'Content-Type':'application/json'}), body: JSON.stringify({ ryokan: state.ryokan, channels: state.channels, jobs: state.jobs, apps: state.apps }) }); } catch (e) {}
   _pushPending = false;
   if (_pushAgain) { _pushAgain = false; pushState(); }
 }
@@ -1240,7 +1256,7 @@ function setConnBadge() {
 }
 async function refreshFromApi(silent) {
   if (!apiMode) return false;
-  try { const s = await apiGet('/api/state'); const before = JSON.stringify(state.apps); state = normLoaded(s); render(); if (!silent) toast('最新の状態に更新しました'); return before !== JSON.stringify(state.apps); }
+  try { const s = await apiGet(apiUrl('state')); const before = JSON.stringify(state.apps); state = normLoaded(s); render(); if (!silent) toast('最新の状態に更新しました'); return before !== JSON.stringify(state.apps); }
   catch (e) { if (!silent) toast('更新に失敗しました'); return false; }
 }
 function startPoll() {
@@ -1248,11 +1264,11 @@ function startPoll() {
   if (!apiMode) return;
   pollTimer = setInterval(async () => {
     if (document.getElementById('overlay').classList.contains('show')) return; // 編集中は中断
-    try { const s = await apiGet('/api/state'); if (JSON.stringify(s.apps) !== JSON.stringify(state.apps) || JSON.stringify(s.channels) !== JSON.stringify(state.channels) || JSON.stringify(s.jobs) !== JSON.stringify(state.jobs)) { state = normLoaded(s); render(); } } catch (e) {}
+    try { const s = await apiGet(apiUrl('state')); if (JSON.stringify(s.apps) !== JSON.stringify(state.apps) || JSON.stringify(s.channels) !== JSON.stringify(state.channels) || JSON.stringify(s.jobs) !== JSON.stringify(state.jobs)) { state = normLoaded(s); render(); } } catch (e) {}
   }, 10000);
 }
 async function init() {
-  try { const h = await fetch('/api/health', { cache:'no-store' }); if (h.ok) { apiMode = true; const s = await apiGet('/api/state'); state = normLoaded(s); } }
+  try { if (await detectApi()) { apiMode = true; const s = await apiGet(apiUrl('state')); state = normLoaded(s); } }
   catch (e) { apiMode = false; }
   if (!apiMode) { if (!load()) seed(); }
   bindStatic(); render(); setConnBadge(); startPoll();

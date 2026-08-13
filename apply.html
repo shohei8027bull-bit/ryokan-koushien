@@ -94,13 +94,17 @@ body{font-family:var(--sans);background:var(--cream);color:var(--navy);-webkit-f
 </div>
 
 <script>
-const API = ''; // 同一オリジン（バックエンドが配信）
+const API_BASE = location.protocol.startsWith('http') ? location.href.replace(/[^/]*(\?.*)?(#.*)?$/, '') : 'http://localhost:8787/';
+let apiStyle = 'pretty';
+function apiUrl(p){ return apiStyle==='php' ? API_BASE+'api/index.php?__path='+p : API_BASE+'api/'+p; }
+async function detectApi(){ for (const style of ['pretty','php']) { try { const u = style==='php'?API_BASE+'api/index.php?__path=public':API_BASE+'api/public'; const r=await fetch(u,{cache:'no-store'}); if(r.ok){ apiStyle=style; return true; } } catch(e){} } return false; }
 let jobs = [];
 let selectedJob = null;
 
 async function boot() {
   try {
-    const r = await fetch(API + '/api/public');
+    if (!(await detectApi())) throw new Error('offline');
+    const r = await fetch(apiUrl('public'));
     if (!r.ok) throw new Error('offline');
     const data = await r.json();
     if (data.ryokan) {
@@ -119,7 +123,7 @@ async function boot() {
 function showOffline() {
   const b = document.getElementById('offlineBanner');
   b.style.display = 'block';
-  b.innerHTML = 'バックエンドに接続できませんでした。このフォームはサーバー起動時（<code>node server/server.js</code>）に有効になります。<br>その後 <b>http://localhost:8787/apply.html</b> を開いてご利用ください。';
+  b.innerHTML = 'バックエンドに接続できませんでした。このフォームは、サーバー上（PHPが動作する共用サーバー等）に <code>api/</code> フォルダと一緒に配置し、その公開URLから開くと有効になります。';
   document.getElementById('jobs').innerHTML = '<div style="color:var(--gray);font-size:13px;padding:10px 0">求人を読み込めませんでした。</div>';
   document.getElementById('submitBtn').disabled = true;
 }
@@ -152,7 +156,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = '送信中…';
   try {
-    const r = await fetch(API + '/api/apply', {
+    const r = await fetch(apiUrl('apply'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name, jobId: selectedJob,
