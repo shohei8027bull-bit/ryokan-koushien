@@ -1,0 +1,14 @@
+{
+  "name": "hifumi-saiyo-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ひふみ旅館 採用一元管理システムのバックエンド（求人媒体API連携・自社応募フォーム受信）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}

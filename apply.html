@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>採用エントリー | ひふみ旅館</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0D1F3C;--gold:#C9A84C;--gold2:#E8C96D;--cream:#FAF6EE;--white:#fff;--gray:#7C8598;--line:rgba(13,31,60,.1);--red:#A82020;--ok:#2F8F5B;
+--sans:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Meiryo",sans-serif;--serif:'Zen Old Mincho','Noto Serif JP',serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--cream);color:var(--navy);-webkit-font-smoothing:antialiased}
+.hero{background:var(--navy);color:#fff;padding:64px 24px 72px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(201,168,76,.12),transparent 70%)}
+.hero-emblem{position:absolute;width:360px;height:360px;border-radius:50%;border:1px solid rgba(201,168,76,.15);top:50%;left:50%;transform:translate(-50%,-50%)}
+.hero .pl{font-size:11px;letter-spacing:.34em;color:var(--gold);position:relative}
+.hero h1{font-family:var(--serif);font-size:clamp(30px,6vw,44px);font-weight:900;letter-spacing:.06em;margin:14px 0 12px;position:relative}
+.hero .sub{font-size:12px;letter-spacing:.3em;color:rgba(255,255,255,.5);position:relative}
+.hero .copy{font-size:14px;color:rgba(255,255,255,.72);line-height:1.9;max-width:600px;margin:20px auto 0;position:relative}
+.wrap{max-width:720px;margin:-40px auto 60px;padding:0 20px;position:relative;z-index:2}
+.card{background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px rgba(13,31,60,.1);overflow:hidden}
+.card-head{padding:26px 30px;border-bottom:1px solid var(--line)}
+.card-head h2{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:.05em}
+.card-head p{font-size:12px;color:var(--gray);margin-top:6px;line-height:1.7}
+.card-body{padding:26px 30px}
+.jobs{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.job-opt{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:11px;cursor:pointer;transition:border-color .15s,background .15s}
+.job-opt:hover{border-color:var(--gold)}
+.job-opt.on{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.job-opt input{margin-top:4px}
+.job-opt .jt{font-family:var(--serif);font-size:16px;font-weight:700}
+.job-opt .jtags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.job-opt .tag{font-size:11px;color:var(--gray);background:var(--cream);border:1px solid var(--line);padding:3px 10px;border-radius:6px}
+.job-opt .tag.sal{color:var(--navy);font-weight:700}
+.job-opt .jd{font-size:12px;color:var(--gray);line-height:1.8;margin-top:8px}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:7px}
+.field label .req{color:var(--red);margin-left:4px}
+.field input,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--white);color:var(--navy);outline:none;font-family:inherit;transition:border-color .15s}
+.field input:focus,.field textarea:focus{border-color:var(--gold)}
+.field textarea{min-height:110px;resize:vertical;line-height:1.7}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-lbl{font-size:10px;letter-spacing:.3em;color:var(--gold);font-weight:700;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.1em;background:var(--gold);color:var(--navy);cursor:pointer;transition:all .18s}
+.btn:hover{background:var(--gold2);box-shadow:0 8px 22px rgba(201,168,76,.35)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.note{font-size:11px;color:var(--gray);text-align:center;margin-top:14px;line-height:1.7}
+.done{text-align:center;padding:20px 10px}
+.done .ic{width:66px;height:66px;border-radius:50%;background:rgba(47,143,91,.12);color:var(--ok);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.done .ic svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:2.4}
+.done h2{font-family:var(--serif);font-size:24px;margin-bottom:12px}
+.done p{font-size:14px;color:var(--gray);line-height:2}
+.done .again{margin-top:24px;background:none;border:1px solid var(--line);color:var(--navy);padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;width:auto}
+.done .again:hover{border-color:var(--gold);color:var(--gold)}
+.banner{background:rgba(199,135,31,.1);border:1px solid rgba(199,135,31,.3);color:#9c6b17;font-size:12.5px;line-height:1.8;padding:14px 18px;border-radius:10px;margin-bottom:22px}
+.foot{text-align:center;font-size:11px;color:var(--gray);letter-spacing:.1em;padding-bottom:40px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-emblem"></div>
+  <div class="pl">RECRUIT</div>
+  <h1 id="ryokanName">ひふみ旅館</h1>
+  <div class="sub" id="ryokanArea">RECRUITING</div>
+  <div class="copy" id="ryokanCopy"></div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="card-head">
+      <h2>採用エントリーフォーム</h2>
+      <p>下記フォームからご応募いただけます。いただいた内容は採用担当に直接届きます。</p>
+    </div>
+    <div class="card-body" id="formArea">
+      <div id="offlineBanner" class="banner" style="display:none"></div>
+      <div class="section-lbl">STEP 1 ｜ 応募する職種</div>
+      <div class="jobs" id="jobs"></div>
+
+      <div class="section-lbl">STEP 2 ｜ ご連絡先</div>
+      <div class="field"><label>お名前<span class="req">*</span></label><input id="f-name" placeholder="例）山田 太郎"></div>
+      <div class="row">
+        <div class="field"><label>メールアドレス</label><input id="f-email" type="email" placeholder="mail@example.com"></div>
+        <div class="field"><label>電話番号</label><input id="f-tel" placeholder="090-0000-0000"></div>
+      </div>
+      <div class="field"><label>志望動機・メッセージ</label><textarea id="f-msg" placeholder="これまでのご経験や、当館で働きたい理由をお聞かせください"></textarea></div>
+
+      <button class="btn" id="submitBtn">この内容で応募する</button>
+      <p class="note">※ このフォームは自社採用サイトとして採用管理システムに直結しています。<br>送信すると、応募が担当画面の選考パイプラインに自動で追加されます。</p>
+    </div>
+  </div>
+  <p class="foot" style="margin-top:22px" id="footName">© ひふみ旅館</p>
+</div>
+
+<script>
+const API = ''; // 同一オリジン（バックエンドが配信）
+let jobs = [];
+let selectedJob = null;
+
+async function boot() {
+  try {
+    const r = await fetch(API + '/api/public');
+    if (!r.ok) throw new Error('offline');
+    const data = await r.json();
+    if (data.ryokan) {
+      document.getElementById('ryokanName').textContent = data.ryokan.name || 'ひふみ旅館';
+      document.getElementById('ryokanArea').textContent = data.ryokan.area || 'RECRUITING';
+      document.getElementById('ryokanCopy').textContent = data.ryokan.copy || '';
+      document.getElementById('footName').textContent = '© ' + (data.ryokan.name || 'ひふみ旅館');
+    }
+    jobs = data.jobs || [];
+    renderJobs();
+  } catch (e) {
+    showOffline();
+  }
+}
+
+function showOffline() {
+  const b = document.getElementById('offlineBanner');
+  b.style.display = 'block';
+  b.innerHTML = 'バックエンドに接続できませんでした。このフォームはサーバー起動時（<code>node server/server.js</code>）に有効になります。<br>その後 <b>http://localhost:8787/apply.html</b> を開いてご利用ください。';
+  document.getElementById('jobs').innerHTML = '<div style="color:var(--gray);font-size:13px;padding:10px 0">求人を読み込めませんでした。</div>';
+  document.getElementById('submitBtn').disabled = true;
+}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function renderJobs() {
+  const box = document.getElementById('jobs');
+  if (!jobs.length) { box.innerHTML = '<div style="color:var(--gray);font-size:13px;padding:10px 0">現在募集中の求人はありません。</div>'; document.getElementById('submitBtn').disabled = true; return; }
+  box.innerHTML = jobs.map((j, i) => `
+    <label class="job-opt ${i===0?'on':''}" data-job="${esc(j.id)}">
+      <input type="radio" name="job" value="${esc(j.id)}" ${i===0?'checked':''}>
+      <div>
+        <div class="jt">${esc(j.title)}</div>
+        <div class="jtags"><span class="tag">${esc(j.emp)}</span><span class="tag sal">${esc(j.salary)}</span><span class="tag">${esc(j.place)}</span></div>
+        ${j.desc?`<div class="jd">${esc(j.desc)}</div>`:''}
+      </div>
+    </label>`).join('');
+  selectedJob = jobs[0].id;
+  box.querySelectorAll('.job-opt').forEach(o => o.addEventListener('click', () => {
+    box.querySelectorAll('.job-opt').forEach(x => x.classList.remove('on'));
+    o.classList.add('on'); o.querySelector('input').checked = true; selectedJob = o.dataset.job;
+  }));
+}
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('お名前を入力してください'); return; }
+  if (!selectedJob) { alert('応募する職種を選択してください'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '送信中…';
+  try {
+    const r = await fetch(API + '/api/apply', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, jobId: selectedJob,
+        email: document.getElementById('f-email').value.trim(),
+        tel: document.getElementById('f-tel').value.trim(),
+        msg: document.getElementById('f-msg').value.trim(),
+      })
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) throw new Error(data.error || '送信に失敗しました');
+    showDone();
+  } catch (e) {
+    alert('送信に失敗しました：' + e.message);
+    btn.disabled = false; btn.textContent = 'この内容で応募する';
+  }
+});
+
+function showDone() {
+  document.getElementById('formArea').innerHTML = `
+    <div class="done">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h2>ご応募ありがとうございます</h2>
+      <p>応募を受け付けました。<br>採用担当より追ってご連絡いたします。</p>
+      <button class="again" onclick="location.reload()">別の職種に応募する</button>
+    </div>`;
+}
+
+boot();
+</script>
+</body>
+</html>

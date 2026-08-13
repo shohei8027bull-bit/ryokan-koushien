@@ -387,6 +387,16 @@ a { color: inherit; }
 .bar-row .bt > div { height: 100%; border-radius: 20px; }
 .bar-row .bn { font-size: 12px; color: var(--gray); width: 44px; text-align: right; }
 
+/* ===== CONNECTION / API ===== */
+.conn-pill { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--gray); background:var(--cream); border:1px solid var(--line); padding:6px 12px; border-radius:20px; white-space:nowrap; }
+.conn-pill .cd { width:7px; height:7px; border-radius:50%; background:var(--gray); }
+.conn-pill.on { color:var(--ok); border-color:rgba(47,143,91,.3); background:rgba(47,143,91,.08); }
+.conn-pill.on .cd { background:var(--ok); box-shadow:0 0 0 3px rgba(47,143,91,.15); }
+.conn-info { background:var(--white); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:18px; }
+.ci-h { font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--gray); margin-bottom:8px; }
+.ci-row { display:flex; align-items:center; gap:8px; }
+.conn-info code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:7px 10px; color:var(--navy); word-break:break-all; flex:1; }
+
 .mobile-only { display: none; }
 
 /* ===== RESPONSIVE ===== */
@@ -470,6 +480,10 @@ a { color: inherit; }
         <div class="topbar-sub" id="topSub">採用活動の全体状況</div>
       </div>
       <div class="topbar-actions">
+        <span class="conn-pill" id="connPill" title="データの保存先"><span class="cd"></span>ローカル保存</span>
+        <button class="btn btn-ghost btn-sm" id="refreshBtn" style="display:none" title="サーバーから最新を取得">
+          <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>更新
+        </button>
         <div class="search-box">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input type="text" id="globalSearch" placeholder="求人・応募者を検索">
@@ -507,6 +521,12 @@ const STATUS = {
 };
 const STATUS_ORDER = ['new','screening','interview','offer','rejected'];
 const CH_STATUS = { active: { label: '掲載中', cls: 'b-active' }, paused: { label: '停止中', cls: 'b-paused' } };
+const CONNECTORS = {
+  'manual':          { label: '手動入力', auto: false },
+  'self-site':       { label: '自社採用サイト（フォーム直結）', auto: true },
+  'indeed':          { label: 'Indeed Apply', auto: true },
+  'generic-webhook': { label: '汎用Webhook', auto: true },
+};
 
 /* ---------- state ---------- */
 let state = { seq: 1, ryokan: { name: 'ひふみ旅館', area: '', copy: '' }, channels: [], jobs: [], apps: [] };
@@ -516,9 +536,11 @@ let currentTab = 'apps';
 let searchTerm = '';
 let chFilter = 'all';
 let appChFilter = 'all';
+let apiMode = false;
+let pollTimer = null;
 
 /* ---------- persistence ---------- */
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); if (apiMode) pushState(); }
 function load() {
   const raw = localStorage.getItem(STORE_KEY);
   if (raw) { try { state = JSON.parse(raw); return true; } catch(e){} }
@@ -529,13 +551,13 @@ function uid(p) { return p + '_' + (state.seq++).toString(36) + Date.now().toStr
 /* ---------- seed ---------- */
 function seed() {
   state = { seq: 1, ryokan: { name: 'ひふみ旅館', area: '京都府・京都駅前', copy: '京都駅から徒歩5分。国内外のお客様を和のおもてなしでお迎えする町家旅館です。スタッフの笑顔がいちばんのおもてなしです。' }, channels: [], jobs: [], apps: [] };
-  const ch = (name, kind, status, cost, color) => { const c = { id: uid('c'), name, kind, status, cost, color, note:'' }; state.channels.push(c); return c.id; };
-  const cIndeed = ch('Indeed', '有料求人媒体', 'active', 50000, '#2557A7');
-  const cTown   = ch('タウンワーク', '有料求人媒体', 'active', 80000, '#FF6A6A');
-  const cAir    = ch('Airワーク', '無料求人媒体', 'active', 0, '#F2994A');
-  const cHello  = ch('ハローワーク', 'ハローワーク', 'active', 0, '#2F8F5B');
-  const cOwn    = ch('自社採用サイト', '自社採用サイト', 'active', 0, '#0D1F3C');
-  const cOmo    = ch('おもてなしHR', '有料求人媒体', 'paused', 60000, '#00A4BD');
+  const ch = (name, kind, status, cost, color, connector, config) => { const c = { id: uid('c'), name, kind, status, cost, color, note:'', connector: connector||'manual', config: config||{} }; state.channels.push(c); return c.id; };
+  const cIndeed = ch('Indeed', '有料求人媒体', 'active', 50000, '#2557A7', 'indeed', { secret: 'demo-indeed-secret' });
+  const cTown   = ch('タウンワーク', '有料求人媒体', 'active', 80000, '#FF6A6A', 'manual', {});
+  const cAir    = ch('Airワーク', '無料求人媒体', 'active', 0, '#F2994A', 'manual', {});
+  const cHello  = ch('ハローワーク', 'ハローワーク', 'active', 0, '#2F8F5B', 'manual', {});
+  const cOwn    = ch('自社採用サイト', '自社採用サイト', 'active', 0, '#0D1F3C', 'self-site', {});
+  const cOmo    = ch('おもてなしHR', '有料求人媒体', 'paused', 60000, '#00A4BD', 'generic-webhook', { secret: 'demo-omo-secret', fieldMap: { name:'candidate_name', email:'mail', tel:'phone', msg:'motivation', jobTitle:'position' } });
 
   const job = (title, emp, salary, place, desc, req, channelIds) => { const j = { id: uid('j'), title, emp, salary, place, desc, req, status:'open', channelIds, createdAt: Date.now()-86400000*20 }; state.jobs.push(j); return j.id; };
   const jFront = job('フロント・接客スタッフ', '正社員', '月給 23〜28万円', '京都市下京区（京都駅より徒歩5分）', 'チェックイン・チェックアウト対応、館内案内、予約管理を担当いただきます。英語での接客歓迎、未経験からでも先輩がしっかりサポートします。', '未経験可／おもてなしに興味のある方', [cIndeed, cTown, cOwn, cHello]);
@@ -648,6 +670,11 @@ function statusBadge(st) { const s = STATUS[st]; return `<span class="badge ${s.
 function chStatusBadge(st) { const s = CH_STATUS[st]; return `<span class="badge ${s.cls}"><span class="dot"></span>${s.label}</span>`; }
 function chDot(c) { return c ? `<span class="job-ch-dot" style="background:${c.color}"></span>` : ''; }
 function emptyMini(msg) { return `<div style="text-align:center;padding:40px 0;color:var(--gray);font-size:13px;">${esc(msg)}</div>`; }
+function connMeta(t) { return CONNECTORS[t] || CONNECTORS.manual; }
+function connBadge(c) { return connMeta(c.connector).auto
+  ? '<span class="badge b-active" style="font-size:10px"><span class="dot"></span>自動連携</span>'
+  : '<span class="badge b-paused" style="font-size:10px"><span class="dot"></span>手動</span>'; }
+function apiOrigin() { return (apiMode && location.protocol.startsWith('http')) ? location.origin : 'http://localhost:8787'; }
 
 /* ---------- DASHBOARD ---------- */
 function viewDashboard() {
@@ -752,7 +779,7 @@ function chCard(c) {
       <div class="avatar" style="background:${c.color}">${esc(initials(c.name))}</div>
       <div style="flex:1;min-width:0;">
         <div class="ch-card-name">${esc(c.name)}</div>
-        <div class="ch-card-kind"><span class="kind-tag">${esc(c.kind)}</span></div>
+        <div class="ch-card-kind"><span class="kind-tag">${esc(c.kind)}</span> ${connBadge(c)}</div>
       </div>
       ${chStatusBadge(c.status)}
     </div>
@@ -767,6 +794,37 @@ function chCard(c) {
 }
 
 /* ---------- CHANNEL DETAIL ---------- */
+function renderConnPanel(c) {
+  const meta = connMeta(c.connector);
+  const origin = apiOrigin();
+  let inner = '';
+  if (c.connector === 'self-site') {
+    inner = `<div class="ci-h">応募フォームURL（自社採用サイト）</div>
+      <div class="ci-row"><code>${origin}/apply.html</code><button class="btn btn-outline btn-sm" data-copy="${origin}/apply.html">コピー</button></div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <a class="btn btn-navy btn-sm" href="${origin}/apply.html" target="_blank" rel="noopener">応募フォームを開く</a>
+        <button class="btn btn-outline btn-sm" data-testapply>テスト応募を送信</button>
+      </div>
+      <div class="hint" style="margin-top:10px">このフォームからの応募は、自動でこの媒体として選考パイプラインに追加されます（#1）。</div>`;
+  } else if (meta.auto) {
+    const secret = (c.config && c.config.secret) || '（未設定）';
+    inner = `<div class="ci-h">Webhook 受信URL（${esc(meta.label)}）</div>
+      <div class="ci-row"><code>${origin}/api/webhooks/${esc(c.id)}</code><button class="btn btn-outline btn-sm" data-copy="${origin}/api/webhooks/${esc(c.id)}">コピー</button></div>
+      <div class="ci-h" style="margin-top:14px">受信シークレット（x-webhook-secret ヘッダ）</div>
+      <div class="ci-row"><code>${esc(secret)}</code></div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-navy btn-sm" data-simulate="${c.id}">テスト受信（シミュレート）</button>
+      </div>
+      <div class="hint" style="margin-top:10px">${c.connector==='indeed'
+        ? 'Indeed のパートナー審査後、Apply/Disposition Webhook をこのURLへ向けると応募が自動取り込みされます（#4）。'
+        : '送信側から上記URLへ、x-webhook-secret ヘッダ付きでPOSTすると自動取り込みされます（#4）。'}</div>`;
+  } else {
+    inner = `<div class="hint" style="margin:0">この媒体は「手動入力」です。応募は「応募者を手動追加」やCSV等で登録します。<br>自動連携するには「媒体設定」から連携方法を変更してください。</div>`;
+  }
+  const warn = apiMode ? '' : `<div class="hint" style="margin-top:12px;color:var(--warn)">※ テスト送信・自動取り込みはバックエンド起動時（<code style="padding:2px 6px">node server/server.js</code>）に有効になります。現在はローカル保存モードです。</div>`;
+  return `<div class="panel" style="margin-bottom:20px;"><div class="panel-head"><div><h3>API連携</h3><div class="sub">${esc(meta.label)}</div></div>${connBadge(c)}</div><div class="panel-body" style="padding:18px 22px 20px;"><div class="conn-info" style="margin:0">${inner}</div>${warn}</div></div>`;
+}
+
 function viewChannelDetail() {
   const c = getChannel(currentChId);
   if (!c) { setView('channels'); return ''; }
@@ -793,6 +851,8 @@ function viewChannelDetail() {
     <div class="dm"><div class="l">応募単価</div><div class="v" style="font-size:22px">${m.cpa!=null && c.cost?yen(m.cpa):'—'}</div></div>
     <div class="dm"><div class="l">採用単価</div><div class="v" style="font-size:22px">${m.cph!=null && c.cost?yen(m.cph):'—'}</div></div>
   </div>
+
+  ${renderConnPanel(c)}
 
   <div class="panel" style="margin-bottom:20px;">
     <div class="panel-head"><div><h3>この媒体に掲載中の求人</h3><div class="sub">${jobs.length}件</div></div></div>
@@ -941,6 +1001,8 @@ function channelFormModal(chId) {
   const c = chId ? getChannel(chId) : null;
   const isEdit = !!c;
   const color = c ? c.color : PALETTE[0];
+  const conn0 = c ? (c.connector||'manual') : 'manual';
+  let secret = c && c.config ? (c.config.secret||'') : '';
   openModal(`
   <div class="modal">
     <div class="modal-head"><div><h3>${isEdit?'求人媒体を編集':'求人媒体を追加'}</h3><div class="sub">${isEdit?esc(c.name):'掲載しているチャネルを登録'}</div></div><button class="modal-close" data-close>×</button></div>
@@ -951,6 +1013,8 @@ function channelFormModal(chId) {
         <div class="field"><label>掲載状態</label><select id="c-status">${Object.keys(CH_STATUS).map(k=>`<option value="${k}" ${c&&c.status===k?'selected':(!c&&k==='active'?'selected':'')}>${CH_STATUS[k].label}</option>`).join('')}</select></div>
       </div>
       <div class="field"><label>月額掲載費（円）</label><input id="c-cost" type="number" min="0" step="1000" value="${c?(c.cost||0):0}" placeholder="0"><div class="hint">無料媒体・自社サイト・ハローワークは 0 のままで構いません。費用対効果の計算に使います。</div></div>
+      <div class="field"><label>連携方法（API連携）</label><select id="c-conn">${Object.keys(CONNECTORS).map(k=>`<option value="${k}" ${conn0===k?'selected':''}>${CONNECTORS[k].label}</option>`).join('')}</select><div class="hint">「自動連携」を選ぶと、その媒体からの応募をWebhookで自動取り込みできます。</div></div>
+      <div id="c-conn-extra"></div>
       <div class="field"><label>メモ</label><input id="c-note" value="${c?esc(c.note||''):''}" placeholder="担当者・契約更新日など（任意）"></div>
       <div class="field"><label>テーマカラー</label><div class="color-swatches" id="c-colors">${PALETTE.map(p=>`<button type="button" class="color-swatch ${p===color?'sel':''}" data-color="${p}" style="background:${p}"></button>`).join('')}</div></div>
     </div>
@@ -958,11 +1022,39 @@ function channelFormModal(chId) {
   </div>`);
 
   let picked = color;
+  function renderExtra() {
+    const conn = document.getElementById('c-conn').value;
+    const box = document.getElementById('c-conn-extra');
+    const meta = connMeta(conn);
+    if (!meta.auto) { box.innerHTML = `<div class="hint" style="margin:-8px 0 18px">この媒体は自動連携なし。応募は「応募者を手動追加」やCSV等で登録します。</div>`; return; }
+    const origin = apiOrigin();
+    if (conn === 'self-site') {
+      box.innerHTML = `<div class="conn-info"><div class="ci-h">自社採用サイトの応募フォーム</div><div class="ci-row"><code>${origin}/apply.html</code></div><div class="hint">このURLの応募フォームから送信された応募が、自動でこの媒体として取り込まれます。</div></div>`;
+      return;
+    }
+    const url = isEdit ? `${origin}/api/webhooks/${c.id}` : '保存後に発行されます';
+    box.innerHTML = `<div class="conn-info">
+      <div class="ci-h">Webhook 受信URL</div>
+      <div class="ci-row"><code>${esc(url)}</code></div>
+      <div class="field" style="margin:14px 0 0"><label>受信シークレット</label>
+        <div style="display:flex;gap:8px"><input id="c-secret" value="${esc(secret)}" placeholder="送信元と共有する秘密鍵" style="flex:1"><button type="button" class="btn btn-outline btn-sm" id="c-gen">生成</button></div>
+        <div class="hint">${conn==='indeed'?'Indeed Apply 連携時、この値を x-webhook-secret ヘッダで検証します。':'送信側で x-webhook-secret ヘッダにこの値を設定してください。'}${isEdit?'':' ※ Webhook URLは保存後に確定します。'}</div>
+      </div>
+    </div>`;
+    const gi = document.getElementById('c-gen'); if (gi) gi.onclick = () => { secret = 'whk_'+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,6); document.getElementById('c-secret').value = secret; };
+    const si = document.getElementById('c-secret'); if (si) si.oninput = e => secret = e.target.value;
+  }
+  renderExtra();
+  document.getElementById('c-conn').addEventListener('change', renderExtra);
   document.getElementById('c-colors').addEventListener('click', e => { const b=e.target.closest('[data-color]'); if(!b)return; picked=b.dataset.color; document.querySelectorAll('#c-colors .color-swatch').forEach(x=>x.classList.toggle('sel',x===b)); });
   document.querySelector('[data-savech]').addEventListener('click', () => {
     const name = document.getElementById('c-name').value.trim();
     if (!name) { toast('媒体名を入力してください'); return; }
-    const data = { name, kind: document.getElementById('c-kind').value, status: document.getElementById('c-status').value, cost: parseInt(document.getElementById('c-cost').value,10)||0, note: document.getElementById('c-note').value.trim(), color: picked };
+    const conn = document.getElementById('c-conn').value;
+    const si = document.getElementById('c-secret'); if (si) secret = si.value.trim();
+    const config = Object.assign({}, c && c.config ? c.config : {});
+    if (connMeta(conn).auto && conn !== 'self-site') config.secret = secret;
+    const data = { name, kind: document.getElementById('c-kind').value, status: document.getElementById('c-status').value, cost: parseInt(document.getElementById('c-cost').value,10)||0, note: document.getElementById('c-note').value.trim(), color: picked, connector: conn, config };
     if (isEdit) { Object.assign(c, data); toast('媒体を更新しました'); save(); closeModal(); render(); }
     else { const nc = { id: uid('c'), ...data }; state.channels.push(nc); currentChId = nc.id; toast('求人媒体を追加しました'); save(); closeModal(); setView('chDetail'); }
   });
@@ -1081,6 +1173,7 @@ function bindStatic() {
   document.getElementById('overlay').addEventListener('click', e => { if(e.target.id==='overlay'||e.target.closest('[data-close]')) closeModal(); });
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
   document.getElementById('menuBtn').addEventListener('click', () => { const sb=document.getElementById('sidebar'); sb.classList.add('open'); const s=el('<div class="scrim"></div>'); s.addEventListener('click',()=>{sb.classList.remove('open');s.remove();}); document.body.appendChild(s); });
+  document.getElementById('refreshBtn').addEventListener('click', () => refreshFromApi(false));
 }
 
 function bindDynamic() {
@@ -1098,6 +1191,9 @@ function bindDynamic() {
   c.querySelectorAll('[data-deljob]').forEach(b => b.onclick = () => { const j=getJob(b.dataset.deljob); if(confirm(`求人「${j.title}」を削除しますか？関連する応募者データも削除されます。`)){ state.jobs=state.jobs.filter(x=>x.id!==j.id); state.apps=state.apps.filter(a=>a.jobId!==j.id); save(); render(); toast('求人を削除しました'); }});
   c.querySelectorAll('[data-app]').forEach(b => b.onclick = () => appDetailModal(b.dataset.app));
   c.querySelectorAll('[data-newapp]').forEach(b => b.onclick = () => appFormModal());
+  c.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => { const t=b.dataset.copy; if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>toast('URLをコピーしました')).catch(()=>toast(t)); } else toast(t); });
+  c.querySelectorAll('[data-simulate]').forEach(b => b.onclick = async () => { if(!apiMode){toast('バックエンド起動時に利用できます');return;} b.disabled=true; try{ const r=await fetch('/api/channels/'+b.dataset.simulate+'/simulate',{method:'POST'}); const d=await r.json(); if(d.ok){ await refreshFromApi(true); toast('テスト応募を受信しました：'+d.applicant.name); } else toast(d.error||'受信に失敗しました'); }catch(e){ toast('通信に失敗しました'); } b.disabled=false; });
+  c.querySelector('[data-testapply]')?.addEventListener('click', async () => { if(!apiMode){toast('バックエンド起動時に利用できます');return;} try{ const r=await fetch('/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'テスト 応募者',email:'test@example.com',msg:'自社フォームからのテスト応募です'})}); const d=await r.json(); if(d.ok){ await refreshFromApi(true); toast('自社フォームからのテスト応募を受信しました'); } else toast(d.error||'失敗しました'); }catch(e){ toast('通信に失敗しました'); } });
 
   c.querySelector('[data-savesettings]')?.addEventListener('click', () => { state.ryokan.name=document.getElementById('set-name').value.trim()||'ひふみ旅館'; state.ryokan.area=document.getElementById('set-area').value.trim(); state.ryokan.copy=document.getElementById('set-copy').value.trim(); save(); render(); toast('基本情報を保存しました'); });
   c.querySelector('[data-export]')?.addEventListener('click', doExport);
@@ -1120,10 +1216,48 @@ function doImport(e) {
   reader.readAsText(file);
 }
 
-/* ---------- INIT ---------- */
-if (!load()) seed();
-bindStatic();
-render();
+/* ============================================================
+   API 連携 / 初期化
+   バックエンド（server/server.js）が起動していれば自動的に接続し、
+   データはサーバー（SQLite）を正とする。未起動ならローカル保存で動作。
+   ============================================================ */
+async function apiGet(path) { const r = await fetch(path, { cache: 'no-store' }); if (!r.ok) throw new Error('http ' + r.status); return r.json(); }
+
+let _pushPending = false, _pushAgain = false;
+async function pushState() {
+  if (_pushPending) { _pushAgain = true; return; }
+  _pushPending = true;
+  try { await fetch('/api/state', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ryokan: state.ryokan, channels: state.channels, jobs: state.jobs, apps: state.apps }) }); } catch (e) {}
+  _pushPending = false;
+  if (_pushAgain) { _pushAgain = false; pushState(); }
+}
+function normLoaded(s) { return { seq: state.seq || 1, ryokan: s.ryokan || { name:'ひふみ旅館', area:'', copy:'' }, channels: s.channels || [], jobs: s.jobs || [], apps: s.apps || [] }; }
+function setConnBadge() {
+  const p = document.getElementById('connPill'); const rb = document.getElementById('refreshBtn');
+  if (!p) return;
+  if (apiMode) { p.className = 'conn-pill on'; p.innerHTML = '<span class="cd"></span>サーバー接続中'; if (rb) rb.style.display = 'inline-flex'; }
+  else { p.className = 'conn-pill'; p.innerHTML = '<span class="cd"></span>ローカル保存'; if (rb) rb.style.display = 'none'; }
+}
+async function refreshFromApi(silent) {
+  if (!apiMode) return false;
+  try { const s = await apiGet('/api/state'); const before = JSON.stringify(state.apps); state = normLoaded(s); render(); if (!silent) toast('最新の状態に更新しました'); return before !== JSON.stringify(state.apps); }
+  catch (e) { if (!silent) toast('更新に失敗しました'); return false; }
+}
+function startPoll() {
+  if (pollTimer) clearInterval(pollTimer);
+  if (!apiMode) return;
+  pollTimer = setInterval(async () => {
+    if (document.getElementById('overlay').classList.contains('show')) return; // 編集中は中断
+    try { const s = await apiGet('/api/state'); if (JSON.stringify(s.apps) !== JSON.stringify(state.apps) || JSON.stringify(s.channels) !== JSON.stringify(state.channels) || JSON.stringify(s.jobs) !== JSON.stringify(state.jobs)) { state = normLoaded(s); render(); } } catch (e) {}
+  }, 10000);
+}
+async function init() {
+  try { const h = await fetch('/api/health', { cache:'no-store' }); if (h.ok) { apiMode = true; const s = await apiGet('/api/state'); state = normLoaded(s); } }
+  catch (e) { apiMode = false; }
+  if (!apiMode) { if (!load()) seed(); }
+  bindStatic(); render(); setConnBadge(); startPoll();
+}
+init();
 </script>
 </body>
 </html>
