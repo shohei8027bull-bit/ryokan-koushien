@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TGSC-10DCL 厨房マニュアル</title>
+<meta name="description" content="タニコー製ガス式デラックススチームコンベクションオーブン TGSC-10DCL（10段・左開き）の始業点検・基本操作・調理モード・清掃・トラブル対応をまとめた厨房スタッフ向けマニュアル">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light dark;
+  --ground: #F4F5F6;
+  --surface: #FFFFFF;
+  --surface-2: #EBEEF0;
+  --ink: #1B2127;
+  --muted: #5A656F;
+  --line: #D2D8DD;
+  --line-strong: #A9B3BC;
+  --flame: #D45F0C;
+  --flame-soft: #FBE9DB;
+  --steam: #2C6C9C;
+  --steam-soft: #DDEAF4;
+  --danger: #B3261E;
+  --danger-soft: #F9E1DF;
+  --ok: #2E7D4F;
+  --ok-soft: #DDF0E4;
+  --shadow: 0 1px 2px rgba(27,33,39,0.06), 0 8px 24px rgba(27,33,39,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #14181C;
+    --surface: #1D2328;
+    --surface-2: #262D33;
+    --ink: #E7EBEE;
+    --muted: #9AA5AE;
+    --line: #333B43;
+    --line-strong: #4C5762;
+    --flame: #F0893B;
+    --flame-soft: #3A2716;
+    --steam: #6FA9D8;
+    --steam-soft: #17293A;
+    --danger: #F0776D;
+    --danger-soft: #3A1E1C;
+    --ok: #6CC38F;
+    --ok-soft: #173124;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #14181C;
+  --surface: #1D2328;
+  --surface-2: #262D33;
+  --ink: #E7EBEE;
+  --muted: #9AA5AE;
+  --line: #333B43;
+  --line-strong: #4C5762;
+  --flame: #F0893B;
+  --flame-soft: #3A2716;
+  --steam: #6FA9D8;
+  --steam-soft: #17293A;
+  --danger: #F0776D;
+  --danger-soft: #3A1E1C;
+  --ok: #6CC38F;
+  --ok-soft: #173124;
+  --shadow: none;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: 'BIZ UDPGothic', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  font-size: 16px;
+  line-height: 1.85;
+  font-feature-settings: "palt";
+}
+h1, h2, h3, h4 {
+  font-family: 'Zen Kaku Gothic New', 'BIZ UDPGothic', 'Hiragino Sans', sans-serif;
+  line-height: 1.35;
+  text-wrap: balance;
+  margin: 0;
+}
+p { margin: 0; }
+a { color: var(--steam); }
+:focus-visible { outline: 3px solid var(--flame); outline-offset: 2px; }
+
+/* ===== 上部バー ===== */
+.topbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding-block: 10px;
+  padding-inline: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.topbar-id {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+.model-tag {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-weight: 900;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  color: var(--flame);
+  white-space: nowrap;
+}
+.topbar-sub {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-print {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-print:hover { border-color: var(--flame); color: var(--flame); }
+
+/* ===== レイアウト ===== */
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: 20px;
+  padding-block: 32px 80px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+.toc {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 72px);
+  font-size: 13px;
+}
+.toc-title {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--line);
+}
+.toc li a {
+  display: block;
+  padding: 5px 0 5px 14px;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+}
+.toc li a:hover { color: var(--ink); border-left-color: var(--flame); }
+.toc-num { color: var(--flame); font-weight: 700; margin-right: 6px; font-variant-numeric: tabular-nums; }
+main { min-width: 0; }
+
+/* ===== 表紙ブロック ===== */
+.cover {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 32px;
+  margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 32px;
+  align-items: start;
+}
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--flame);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.cover h1 {
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 900;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  margin-bottom: 8px;
+}
+.cover h1 small {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+}
+.cover-lead {
+  color: var(--muted);
+  max-width: 34em;
+  margin-top: 14px;
+}
+.meta-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  font-size: 13px;
+  align-content: start;
+  padding: 16px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+.meta-list dt { color: var(--muted); white-space: nowrap; }
+.meta-list dd { margin: 0; font-weight: 700; }
+.fill { display: inline-block; min-width: 9em; border-bottom: 1px solid var(--line-strong); }
+
+/* ===== 型式の読み方 ===== */
+.model-decode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.decode-part {
+  flex: 1 1 100px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.decode-part b {
+  display: block;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.decode-part span { font-size: 12px; color: var(--muted); }
+.decode-part.hl b { color: var(--flame); }
+
+/* ===== セクション ===== */
+section { margin-bottom: 56px; scroll-margin-top: 90px; }
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 24px;
+}
+.sec-head .num {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--flame);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.sec-head h2 { font-size: 24px; font-weight: 900; }
+.sec-head .en { font-size: 11px; letter-spacing: 0.16em; color: var(--muted); margin-left: auto; }
+h3 { font-size: 18px; font-weight: 700; margin: 28px 0 12px; }
+h3:first-of-type { margin-top: 0; }
+.prose { max-width: 40em; }
+.prose + .prose { margin-top: 10px; }
+ul.plain { margin: 8px 0 0; padding-left: 1.3em; }
+ul.plain li { margin-bottom: 4px; }
+
+/* ===== 注意ボックス ===== */
+.callout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 1px solid transparent;
+}
+.callout .icon {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: start;
+  white-space: nowrap;
+}
+.callout.danger { background: var(--danger-soft); border-color: var(--danger); }
+.callout.danger .icon { background: var(--danger); color: #fff; }
+.callout.warn { background: var(--flame-soft); border-color: var(--flame); }
+.callout.warn .icon { background: var(--flame); color: #fff; }
+.callout.note { background: var(--steam-soft); border-color: var(--steam); }
+.callout.note .icon { background: var(--steam); color: #fff; }
+.callout p { font-size: 15px; }
+.callout ul { margin: 6px 0 0; padding-left: 1.2em; font-size: 15px; }
+
+/* ===== 表 ===== */
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+th {
+  background: var(--surface-2);
+  font-weight: 700;
+  white-space: nowrap;
+  font-size: 13px;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.k { color: var(--muted); white-space: nowrap; width: 11em; }
+.spec-note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* ===== モードチップ ===== */
+.chip {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  line-height: 1.7;
+}
+.chip.steam { background: var(--steam-soft); color: var(--steam); }
+.chip.hot { background: var(--flame-soft); color: var(--flame); }
+.chip.combi { background: linear-gradient(90deg, var(--steam-soft) 50%, var(--flame-soft) 50%); color: var(--ink); }
+
+/* ===== 手順 ===== */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+.steps > li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.steps > li:last-child { border-bottom: none; }
+.steps > li::before {
+  content: counter(step);
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--ground);
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.steps b { display: block; font-size: 16px; }
+.steps p { font-size: 15px; color: var(--muted); max-width: 40em; }
+.steps .tip { color: var(--steam); font-weight: 700; font-size: 14px; }
+
+/* ===== チェックリスト ===== */
+.checks { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.checks li { border-bottom: 1px solid var(--line); }
+.checks li:last-child { border-bottom: none; }
+.checks label {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.checks input { width: 22px; height: 22px; margin: 4px 0 0; accent-color: var(--ok); }
+.checks b { display: block; font-size: 15px; }
+.checks span { font-size: 13px; color: var(--muted); }
+.checks input:checked ~ div { opacity: 0.55; }
+.check-tools { display: flex; gap: 10px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--muted); }
+.check-tools button {
+  font: inherit; font-size: 13px; padding: 4px 12px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 6px; cursor: pointer;
+}
+
+/* ===== 各部の名称図 ===== */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+.diagram svg { width: 100%; height: auto; display: block; }
+.parts { margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.parts li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.parts li:last-child { border-bottom: none; }
+.parts .pn {
+  font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 900; font-size: 13px;
+  width: 24px; height: 24px; border-radius: 50%; background: var(--flame); color: #fff;
+  display: grid; place-items: center;
+}
+.parts b { display: block; }
+.parts span { color: var(--muted); font-size: 13px; }
+
+/* ===== レシピカード ===== */
+.recipes { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.recipe {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.recipe h4 { font-size: 16px; font-weight: 700; }
+.recipe .setting { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.recipe .setting dt { color: var(--muted); }
+.recipe .setting dd { margin: 0; font-weight: 700; }
+.recipe p { font-size: 13px; color: var(--muted); }
+
+/* ===== 連絡先 ===== */
+.contact {
+  background: var(--ink);
+  color: var(--ground);
+  border-radius: 10px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.contact b { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 26px; font-weight: 900; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.contact small { display: block; font-size: 13px; opacity: 0.75; }
+.contact .fill { border-bottom-color: rgba(255,255,255,0.5); }
+
+/* ===== 記録表 ===== */
+.log-table td { height: 40px; }
+.log-table td:not(:first-child) { text-align: center; }
+
+footer.doc-foot {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+footer.doc-foot ul { margin: 6px 0 0; padding-left: 1.2em; }
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; gap: 24px; }
+  .toc { position: static; }
+  .toc ol { display: flex; flex-wrap: wrap; gap: 4px 12px; border: none; }
+  .toc li a { border: none; padding: 2px 0; }
+  .cover { grid-template-columns: 1fr; padding: 24px; }
+  .diagram { grid-template-columns: 1fr; }
+  .contact { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .wrap { padding-inline: 16px; }
+  .topbar { padding-inline: 16px; }
+  .sec-head .en { display: none; }
+}
+
+/* ===== 印刷 ===== */
+@media print {
+  :root { --ground: #fff; --surface: #fff; --surface-2: #f2f2f2; --ink: #000; --muted: #444; --line: #bbb; --line-strong: #888; --shadow: none; }
+  body { font-size: 11pt; }
+  .topbar, .toc, .btn-print, .check-tools { display: none !important; }
+  .wrap { display: block; padding: 0; max-width: none; }
+  section { break-inside: auto; margin-bottom: 28pt; }
+  .sec-head { break-after: avoid; }
+  .cover, .callout, .diagram, .recipe, table, .steps > li, .checks li { break-inside: avoid; }
+  .cover { box-shadow: none; }
+  a { color: inherit; text-decoration: none; }
+  .contact { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .callout, .chip, .steps > li::before, .parts .pn { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-id">
+    <span class="model-tag">TGSC-10DCL</span>
+    <span class="topbar-sub">タニコー ガス式デラックススチームコンベクションオーブン ／ 厨房マニュアル</span>
+  </div>
+  <button type="button" class="btn-print" id="btn-print">印刷する</button>
+</div>
+
+<div class="wrap">
+
+<aside class="toc" aria-label="目次">
+  <p class="toc-title">目次</p>
+  <ol>
+    <li><a href="#s1"><span class="toc-num">1</span>この機器について</a></li>
+    <li><a href="#s2"><span class="toc-num">2</span>安全上の注意</a></li>
+    <li><a href="#s3"><span class="toc-num">3</span>各部の名称</a></li>
+    <li><a href="#s4"><span class="toc-num">4</span>始業前点検</a></li>
+    <li><a href="#s5"><span class="toc-num">5</span>基本操作</a></li>
+    <li><a href="#s6"><span class="toc-num">6</span>調理モード</a></li>
+    <li><a href="#s7"><span class="toc-num">7</span>応用機能</a></li>
+    <li><a href="#s8"><span class="toc-num">8</span>旅館での使用例</a></li>
+    <li><a href="#s9"><span class="toc-num">9</span>清掃と日常保守</a></li>
+    <li><a href="#s10"><span class="toc-num">10</span>困ったとき</a></li>
+    <li><a href="#s11"><span class="toc-num">11</span>点検記録表</a></li>
+  </ol>
+</aside>
+
+<main>
+
+<!-- ===== 表紙 ===== -->
+<div class="cover">
+  <div>
+    <p class="eyebrow">厨房機器 取扱マニュアル</p>
+    <h1>スチーム<wbr>コンベクション<wbr>オーブン<br>TGSC-10DCL
+      <small>タニコー株式会社製 ／ ガス式 デラックスタイプ ／ 1/1ホテルパン 10段 ／ 左開き</small>
+    </h1>
+    <p class="cover-lead">
+      このマニュアルは、当館の厨房で使うスチコンを、初めて触るスタッフでも安全に扱えるようにまとめたものです。
+      始業前の点検から終業後の清掃まで、毎日の流れに沿って読めるようになっています。
+      メーカー付属の取扱説明書と併せてお使いください。
+    </p>
+    <div class="model-decode" aria-label="型式の読み方">
+      <div class="decode-part"><b>TG</b><span>タニコー ガス式</span></div>
+      <div class="decode-part"><b>SC</b><span>スチームコンベクション</span></div>
+      <div class="decode-part"><b>10</b><span>ホテルパン 10段</span></div>
+      <div class="decode-part"><b>D</b><span>デラックスタイプ</span></div>
+      <div class="decode-part"><b>C</b><span>涼厨（クールキッチン）仕様</span></div>
+      <div class="decode-part hl"><b>L</b><span>扉が左開き</span></div>
+    </div>
+  </div>
+  <dl class="meta-list">
+    <dt>設置場所</dt><dd><span class="fill"></span></dd>
+    <dt>ガス種</dt><dd><span class="fill">都市ガス13A ／ LPガス</span></dd>
+    <dt>製造番号</dt><dd><span class="fill"></span></dd>
+    <dt>設置年月</dt><dd><span class="fill"></span></dd>
+    <dt>機器責任者</dt><dd><span class="fill"></span></dd>
+    <dt>洗剤の保管場所</dt><dd><span class="fill"></span></dd>
+    <dt>文書版</dt><dd>第1.0版（2026年9月15日）</dd>
+  </dl>
+</div>
+
+<!-- ===== 1 ===== -->
+<section id="s1">
+  <div class="sec-head"><span class="num">1</span><h2>この機器について</h2><span class="en">OVERVIEW</span></div>
+
+  <p class="prose">
+    スチームコンベクションオーブン（スチコン）は、庫内に熱風を循環させる「ホットエアー」と、蒸気で加熱する「スチーム」、その両方を組み合わせる「コンビ」の3つを1台でこなす加熱機器です。
+    焼く・蒸す・煮る・温め直すといった旅館の朝食・夕食・宴会の調理を、大量かつ均一に、時間と温度を数字で管理しながら仕上げられます。
+  </p>
+
+  <h3>主な仕様</h3>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+        <tr><td class="k">型式</td><td>TGSC-10DCL（現行カタログ型式 TGSC-A10DCL に相当）</td></tr>
+        <tr><td class="k">メーカー</td><td>タニコー株式会社</td></tr>
+        <tr><td class="k">熱源</td><td>ガス（都市ガス13A ／ LPガス）。庫内ファンと制御用に電源も必要</td></tr>
+        <tr><td class="k">ガス消費量</td><td>34.9 kW（30,000 kcal/h）</td></tr>
+        <tr><td class="k">電源・消費電力</td><td>単相100V ／ 0.54 kW（50/60Hz）</td></tr>
+        <tr><td class="k">外形寸法</td><td>間口 860 × 奥行 790 × 高さ 1,030 mm</td></tr>
+        <tr><td class="k">収容段数</td><td>1/1サイズ ホテルパン 10段</td></tr>
+        <tr><td class="k">給水・排水</td><td>給水 15A ／ 排水 40A</td></tr>
+        <tr><td class="k">扉</td><td>左開き（ヒンジが左、取っ手が右）</td></tr>
+        <tr><td class="k">安全装置</td><td>過熱防止装置、立消え安全装置、空焚き防止装置、連続スパーク点火</td></tr>
+        <tr><td class="k">その他</td><td>涼厨仕様（排熱を抑え、厨房内の温度上昇を軽減）</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="spec-note">
+    ※ 数値はメーカー公開カタログ（現行 TGSC-A10DC 系）を元にしています。製造年により細部が異なることがあるため、本体側面の銘板（ラベル）の記載を正としてください。
+  </p>
+</section>
+
+<!-- ===== 2 ===== -->
+<section id="s2">
+  <div class="sec-head"><span class="num">2</span><h2>安全上の注意</h2><span class="en">SAFETY</span></div>
+
+  <div class="callout danger">
+    <span class="icon">危険</span>
+    <div>
+      <p>ガス・蒸気・高温を扱う機器です。次のことは絶対に守ってください。</p>
+      <ul>
+        <li>ガスのにおいがしたら、すぐに元栓を閉め、火気・電気スイッチに触れず、換気してガス会社へ連絡する。</li>
+        <li>運転中や運転直後に扉を勢いよく全開にしない。100℃以上の蒸気が顔に噴き出します。<b>まず少し開けて数秒待ち、蒸気を逃がしてから開ける</b>。</li>
+        <li>庫内・扉・ホテルパン・芯温センサーは高温です。必ず乾いたミトンや布巾を使う。濡れた布は熱が伝わり火傷します。</li>
+        <li>本体外装に直接水をかけない。電装部の故障・感電の原因になります。</li>
+        <li>点火しないときに何度も点火を繰り返さない。未燃ガスがたまります。1分以上待って換気してから再操作する。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="icon">注意</span>
+    <div>
+      <ul>
+        <li>ホテルパンに液体（煮汁・だし）を入れる場合は、上段には置かない。取り出すときに熱い液体が顔や腕にかかります。目線より下の段を使う。</li>
+        <li>ホテルパンは奥までしっかり差し込む。斜めのまま扉を閉めると、扉が開いた拍子に落下します。</li>
+        <li>扉は必ず閉めきる。半開きでは加熱が止まり、蒸気が漏れます。</li>
+        <li>洗剤は必ずスチコン専用のものを使う。家庭用の塩素系・強アルカリ洗剤は庫内を傷め、メーカー保証の対象外になります。</li>
+        <li>芯温センサーのケーブルを扉にはさまない。断線すると芯温調理ができなくなります。</li>
+        <li>排気口の真上に物を置かない。可燃物を本体の近くに置かない。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <span class="icon">ポイント</span>
+    <div>
+      <p>調理後の庫内は熱い蒸気で満ちています。「少し開ける → 待つ → 開ける」の3拍子を厨房の全員で徹底してください。新人が最初に覚える動作です。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3 ===== -->
+<section id="s3">
+  <div class="sec-head"><span class="num">3</span><h2>各部の名称</h2><span class="en">PARTS</span></div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 520 440" role="img" aria-labelledby="dg-title">
+      <title id="dg-title">TGSC-10DCL 正面図の模式図。左側に左開きの扉、右側に操作パネル。</title>
+      <!-- 本体 -->
+      <rect x="30" y="30" width="460" height="330" rx="6" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="2"/>
+      <!-- 扉 -->
+      <rect x="44" y="44" width="300" height="302" rx="4" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="2"/>
+      <!-- ヒンジ（左） -->
+      <rect x="40" y="70" width="8" height="40" rx="2" fill="var(--ink)"/>
+      <rect x="40" y="280" width="8" height="40" rx="2" fill="var(--ink)"/>
+      <!-- ガラス窓 -->
+      <rect x="68" y="66" width="230" height="258" rx="3" fill="var(--steam-soft)" stroke="var(--line)" stroke-width="1.5"/>
+      <!-- 庫内のパンレール（10段の示唆） -->
+      <g stroke="var(--line-strong)" stroke-width="1.5" opacity="0.8">
+        <line x1="82" y1="88" x2="284" y2="88"/><line x1="82" y1="112" x2="284" y2="112"/>
+        <line x1="82" y1="136" x2="284" y2="136"/><line x1="82" y1="160" x2="284" y2="160"/>
+        <line x1="82" y1="184" x2="284" y2="184"/><line x1="82" y1="208" x2="284" y2="208"/>
+        <line x1="82" y1="232" x2="284" y2="232"/><line x1="82" y1="256" x2="284" y2="256"/>
+        <line x1="82" y1="280" x2="284" y2="280"/><line x1="82" y1="304" x2="284" y2="304"/>
+      </g>
+      <!-- 取っ手（右） -->
+      <rect x="312" y="150" width="14" height="90" rx="6" fill="var(--ink)"/>
+      <!-- 操作パネル -->
+      <rect x="360" y="44" width="116" height="302" rx="4" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="2"/>
+      <rect x="372" y="60" width="92" height="120" rx="3" fill="var(--ink)"/>
+      <text x="418" y="112" text-anchor="middle" font-size="11" fill="var(--ground)" font-family="BIZ UDPGothic, sans-serif">タッチパネル</text>
+      <text x="418" y="130" text-anchor="middle" font-size="14" font-weight="700" fill="var(--flame)" font-family="BIZ UDPGothic, sans-serif">180℃ 12:00</text>
+      <!-- 電源ボタン -->
+      <circle cx="418" cy="215" r="14" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="2"/>
+      <circle cx="418" cy="215" r="5" fill="var(--ok)"/>
+      <!-- 芯温センサーのソケット -->
+      <circle cx="418" cy="270" r="9" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="2"/>
+      <path d="M418 279 C418 300, 440 300, 440 320 L440 330" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- 脚 -->
+      <rect x="50" y="360" width="16" height="48" fill="var(--line-strong)"/>
+      <rect x="454" y="360" width="16" height="48" fill="var(--line-strong)"/>
+      <!-- 排水・給水（背面示唆） -->
+      <rect x="230" y="360" width="60" height="10" fill="var(--line-strong)"/>
+      <!-- 番号ラベル -->
+      <g font-family="Zen Kaku Gothic New, sans-serif" font-weight="900" font-size="13" fill="#fff">
+        <circle cx="180" cy="200" r="13" fill="var(--flame)"/><text x="180" y="205" text-anchor="middle">1</text>
+        <circle cx="319" cy="130" r="13" fill="var(--flame)"/><text x="319" y="135" text-anchor="middle">2</text>
+        <circle cx="44" cy="195" r="13" fill="var(--flame)"/><text x="44" y="200" text-anchor="middle">3</text>
+        <circle cx="418" cy="82" r="13" fill="var(--flame)"/><text x="418" y="87" text-anchor="middle">4</text>
+        <circle cx="448" cy="215" r="13" fill="var(--flame)"/><text x="448" y="220" text-anchor="middle">5</text>
+        <circle cx="388" cy="270" r="13" fill="var(--flame)"/><text x="388" y="275" text-anchor="middle">6</text>
+        <circle cx="260" cy="392" r="13" fill="var(--flame)"/><text x="260" y="397" text-anchor="middle">7</text>
+      </g>
+      <text x="260" y="428" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="BIZ UDPGothic, sans-serif">正面図（模式）。実機の配置は製造年で異なります</text>
+    </svg>
+    <ol class="parts">
+      <li><span class="pn">1</span><div><b>庫内（ホテルパン 10段）</b><span>1/1サイズのホテルパンを10枚まで。左右のレールに差し込む</span></div></li>
+      <li><span class="pn">2</span><div><b>扉の取っ手</b><span>右側。手前に引いて開ける。開けきる前に一度止めて蒸気を逃がす</span></div></li>
+      <li><span class="pn">3</span><div><b>ヒンジ（左開き）</b><span>「L」の由来。左側に扉が開くため、右側の作業スペースが空く</span></div></li>
+      <li><span class="pn">4</span><div><b>タッチパネル</b><span>モード・温度・時間・メニュー呼び出し・洗浄の操作はすべてここ</span></div></li>
+      <li><span class="pn">5</span><div><b>電源スイッチ</b><span>始業時に入れ、終業の清掃後に切る</span></div></li>
+      <li><span class="pn">6</span><div><b>芯温センサー差込口</b><span>芯温センサーのプラグを差す。センサー本体は庫内側</span></div></li>
+      <li><span class="pn">7</span><div><b>給水・排水接続（背面下部）</b><span>給水15A、排水40A。本体を動かすときは接続を外さない</span></div></li>
+    </ol>
+  </div>
+  <p class="spec-note">このほか、庫内には取り外して洗えるファンカバー、庫内灯、庫内ハンドシャワー（洗浄用）があります。</p>
+</section>
+
+<!-- ===== 4 ===== -->
+<section id="s4">
+  <div class="sec-head"><span class="num">4</span><h2>始業前点検</h2><span class="en">DAILY CHECK</span></div>
+  <p class="prose">毎朝、最初に火を入れる人が行います。3分で終わります。異常があれば使わずに機器責任者へ報告してください。</p>
+  <ul class="checks" id="check-open">
+    <li><label><input type="checkbox" id="ck1"><div><b>ガス元栓が開いているか</b><span>ハンドルが配管と平行なら「開」</span></div></label></li>
+    <li><label><input type="checkbox" id="ck2"><div><b>給水バルブが開いているか</b><span>閉じたまま運転すると空焚き防止装置が働き、蒸気が出ません</span></div></label></li>
+    <li><label><input type="checkbox" id="ck3"><div><b>庫内に洗剤の残りや異物がないか</b><span>前夜の洗浄後にすすぎ残しがあると、においが食材に移ります</span></div></label></li>
+    <li><label><input type="checkbox" id="ck4"><div><b>ファンカバー・パンレールが正しく取り付いているか</b><span>清掃で外したまま運転するとファンに食材が触れます</span></div></label></li>
+    <li><label><input type="checkbox" id="ck5"><div><b>扉のパッキンに切れ・ずれがないか</b><span>蒸気漏れ・温度ムラの原因</span></div></label></li>
+    <li><label><input type="checkbox" id="ck6"><div><b>排水口のまわりに詰まり・水たまりがないか</b><span>床が濡れていたら排水不良のサイン</span></div></label></li>
+    <li><label><input type="checkbox" id="ck7"><div><b>軟水器の残量表示・塩の残量（設置している場合）</b><span>スケール（水あか）は蒸気発生装置の故障原因の第一位</span></div></label></li>
+    <li><label><input type="checkbox" id="ck8"><div><b>電源を入れ、エラー表示が出ていないか</b><span>表示が出たら「10. 困ったとき」へ</span></div></label></li>
+  </ul>
+  <div class="check-tools">
+    <span>チェックはこの端末にだけ保存されます。</span>
+    <button type="button" id="ck-reset">リセット</button>
+  </div>
+</section>
+
+<!-- ===== 5 ===== -->
+<section id="s5">
+  <div class="sec-head"><span class="num">5</span><h2>基本操作</h2><span class="en">OPERATION</span></div>
+  <p class="prose">
+    どのメニューでも流れは同じです。「予熱 → モードと温度 → 時間 → 入れる → スタート → 取り出す」。
+    タッチパネルのボタン名は製造年により少し異なりますが、順番は変わりません。
+  </p>
+
+  <ol class="steps">
+    <li><div><b>電源を入れる</b><p>電源スイッチを入れ、パネルが点灯して待機画面になるのを待ちます。ガスの点火は運転開始時に自動で行われます。</p></div></li>
+    <li><div><b>予熱する</b><p>使うモードと温度を選び、庫内を空のまま運転して設定温度まで上げます。予熱をしないと、最初の段だけ火が通りません。焼き物なら設定温度より20〜30℃高めで予熱し、食材を入れた後に本来の温度へ下げると、扉を開けた温度落ちを補えます。</p><p class="tip">目安：ホットエアー180℃なら予熱は約10分。</p></div></li>
+    <li><div><b>モードを選ぶ</b><p>スチーム／ホットエアー／コンビのいずれかをパネルで選びます。迷ったら「6. 調理モード」の表を見てください。</p></div></li>
+    <li><div><b>温度と時間を設定する</b><p>温度、時間の順に入力します。時間は0秒〜99時間59分まで設定できます。コンビのときはスチーム量（2〜100％）も指定します。</p></div></li>
+    <li><div><b>食材を入れる</b><p>扉を開け、ホテルパンを奥までしっかり差し込みます。段数が少ないときは中段を使い、上下に均等に分けます。液体の入ったパンは目線より下の段へ。扉を確実に閉めます。</p></div></li>
+    <li><div><b>スタートする</b><p>スタートを押すと加熱と時間のカウントが始まります。途中で扉を開けると運転は一時停止し、閉めると再開します。</p></div></li>
+    <li><div><b>終了・取り出す</b><p>終了のブザーが鳴ったら、扉を少し開けて蒸気を逃がし、数秒待ってから全開にします。乾いたミトンでパンを取り出します。続けて使うときはそのまま次の設定へ。</p></div></li>
+    <li><div><b>終業時</b><p>「9. 清掃と日常保守」の手順で庫内を洗浄してから、電源を切り、ガス元栓を閉めます。給水バルブは施設の決まりに従います。</p></div></li>
+  </ol>
+</section>
+
+<!-- ===== 6 ===== -->
+<section id="s6">
+  <div class="sec-head"><span class="num">6</span><h2>調理モード</h2><span class="en">MODES</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>モード</th><th>設定温度</th><th>何が起きるか</th><th>向いている調理</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="chip steam">スチーム</span></td>
+          <td>30〜100℃</td>
+          <td>蒸気だけで加熱。乾燥せず、色と栄養が残る。100℃未満は低温スチーム。</td>
+          <td>茶碗蒸し、蒸し野菜、温泉卵、しゅうまい、ご飯の蒸らし、真空パックの湯煎代わり</td>
+        </tr>
+        <tr>
+          <td><span class="chip hot">ホットエアー</span></td>
+          <td>30〜300℃</td>
+          <td>熱風だけで加熱。表面に焼き色がつき、カリッと仕上がる。</td>
+          <td>焼き魚、グラタン、焼き菓子、ローストの仕上げ、揚げ物の温め直し</td>
+        </tr>
+        <tr>
+          <td><span class="chip combi">コンビ</span></td>
+          <td>30〜300℃<br><small>スチーム量 2〜100％（50段階）</small></td>
+          <td>熱風と蒸気を同時に。パサつかず中まで火が通り、量が多くても均一。</td>
+          <td>鶏・豚のロースト、煮物、ハンバーグ、宴会の焼き物の大量調理、大量の温め直し</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <span class="icon">目安</span>
+    <div>
+      <p>迷ったときは「コンビ・スチーム量30〜50％」が最も失敗の少ない設定です。焼き色が足りなければ最後の数分だけホットエアーに切り替えます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7 ===== -->
+<section id="s7">
+  <div class="sec-head"><span class="num">7</span><h2>応用機能</h2><span class="en">ADVANCED</span></div>
+
+  <h3>芯温調理（30〜99℃）</h3>
+  <p class="prose">
+    時間ではなく「食材の中心温度」で仕上がりを決める機能です。芯温センサーを食材の一番厚い部分の中心に差し、目標芯温を設定してスタートすると、中心が目標温度に達した時点で自動終了します。
+    ローストビーフや鶏ハムなど、火の通りすぎが命取りの料理に使います。
+  </p>
+  <ul class="plain">
+    <li>センサーは骨や脂を避け、必ず中心へ。斜めに深く差すと安定します。</li>
+    <li>加熱食肉の衛生基準（中心75℃で1分以上など）は、施設の衛生管理計画に従ってください。</li>
+    <li>使用後はセンサーを中性洗剤を含ませた布で拭き、清潔に保ちます。汚れが残ると温度を正しく測れません。</li>
+  </ul>
+
+  <h3>芯温オフセット（温度差 30〜50℃）</h3>
+  <p class="prose">
+    庫内温度を「芯温＋一定の温度差」に自動で追従させる低温調理の機能です。庫内と中心の温度差を小さく保つため、表面が固くならず、ジューシーに仕上がります。夜間や仕込み時間帯の長時間調理に向いています。
+  </p>
+
+  <h3>芯温キープ（ホットエアー 130〜200℃ ／ 芯温 30〜99℃）</h3>
+  <p class="prose">
+    目標芯温に達したあと、その温度を保ったまま待機させる機能です。宴会の提供時間が読めないとき、料理を仕上げた状態で保温しておけます。
+  </p>
+
+  <h3>リヒーティング（100〜160℃）</h3>
+  <p class="prose">
+    作り置きや冷蔵した料理を、乾かさずに温め直す専用モードです。宴会の焼き物・煮物を提供直前に一斉に温めるときに使います。皿盛りのままホテルパンに並べて入れられます。
+  </p>
+
+  <h3>メニューメモリー（9ステップ × 300メニュー）</h3>
+  <p class="prose">
+    「予熱 → コンビ170℃ 15分 → ホットエアー220℃ 3分」のような複数ステップの設定を、名前をつけて保存できます。保存しておけば、次回は呼び出してスタートを押すだけです。
+    当館の定番料理は、責任者が登録し、下表で番号を共有してください。
+  </p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:5em">番号</th><th>メニュー名</th><th>設定内容（ステップ）</th><th style="width:8em">登録者</th></tr></thead>
+      <tbody>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 8 ===== -->
+<section id="s8">
+  <div class="sec-head"><span class="num">8</span><h2>旅館での使用例</h2><span class="en">RECIPES</span></div>
+  <p class="prose">
+    いずれも一般的な目安です。食材の大きさ、ホテルパンの段数、予熱の有無で仕上がりは変わります。必ず最初は少量で試し、当館の値を書き込んで更新してください。
+  </p>
+  <div class="recipes">
+    <article class="recipe">
+      <h4>朝食の焼き魚（塩鮭・干物）</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip hot">ホットエアー</span></dd><dt>温度</dt><dd>230〜250℃</dd><dt>時間</dt><dd>8〜12分</dd></dl>
+      <p>予熱を十分に。網付きホテルパンに皮を上にして並べる。焼き色が弱いときは最後にコンビ0％で1〜2分追加。</p>
+    </article>
+    <article class="recipe">
+      <h4>茶碗蒸し</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip steam">スチーム</span></dd><dt>温度</dt><dd>85〜90℃</dd><dt>時間</dt><dd>18〜25分</dd></dl>
+      <p>100℃にすると「す」が入る。器にラップまたは蓋をして、段の中央に置く。</p>
+    </article>
+    <article class="recipe">
+      <h4>温泉卵</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip steam">スチーム</span></dd><dt>温度</dt><dd>65〜68℃</dd><dt>時間</dt><dd>25〜30分</dd></dl>
+      <p>冷蔵庫から出した卵を穴あきホテルパンに並べる。終了後すぐに冷水へ。</p>
+    </article>
+    <article class="recipe">
+      <h4>蒸し野菜（付け合わせ）</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip steam">スチーム</span></dd><dt>温度</dt><dd>100℃</dd><dt>時間</dt><dd>3〜8分</dd></dl>
+      <p>穴あきホテルパンを使い、根菜と葉物は別のパンに分ける。色止めは氷水で。</p>
+    </article>
+    <article class="recipe">
+      <h4>宴会の鶏もも・豚ロース焼き</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip combi">コンビ</span> 30％</dd><dt>温度</dt><dd>180℃</dd><dt>時間</dt><dd>12〜18分</dd></dl>
+      <p>芯温センサーで中心75℃到達を確認。焼き色は最後にホットエアー220℃で2〜3分。</p>
+    </article>
+    <article class="recipe">
+      <h4>煮物（含め煮・肉じゃが）</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip combi">コンビ</span> 100％</dd><dt>温度</dt><dd>110〜120℃</dd><dt>時間</dt><dd>30〜45分</dd></dl>
+      <p>深型ホテルパンにだしごと入れ、落とし蓋代わりにクッキングシート。目線より下の段へ。</p>
+    </article>
+    <article class="recipe">
+      <h4>提供前の温め直し（皿盛り）</h4>
+      <dl class="setting"><dt>モード</dt><dd>リヒーティング</dd><dt>温度</dt><dd>120〜140℃</dd><dt>時間</dt><dd>6〜10分</dd></dl>
+      <p>皿ごとホテルパンに載せる。陶器は熱くなるので取り出しは必ずミトン。</p>
+    </article>
+    <article class="recipe">
+      <h4>ご飯の蒸らし・保温</h4>
+      <dl class="setting"><dt>モード</dt><dd><span class="chip steam">スチーム</span></dd><dt>温度</dt><dd>70〜80℃</dd><dt>時間</dt><dd>提供まで</dd></dl>
+      <p>炊きあがったご飯を深型パンに移し、乾かず保温できる。長時間はにおいの原因になるので2時間まで。</p>
+    </article>
+  </div>
+</section>
+
+<!-- ===== 9 ===== -->
+<section id="s9">
+  <div class="sec-head"><span class="num">9</span><h2>清掃と日常保守</h2><span class="en">CLEANING</span></div>
+
+  <div class="callout warn">
+    <span class="icon">注意</span>
+    <div>
+      <p>洗剤はスチコン専用の庫内洗剤とリンス剤（メーカー指定品）を使います。外装は中性洗剤のみ。本体に直接水をかけないでください。</p>
+    </div>
+  </div>
+
+  <h3>毎日（終業後）</h3>
+  <ol class="steps">
+    <li><div><b>庫内を冷ます</b><p>運転を止め、扉を少し開けて庫内温度が60℃程度まで下がるのを待ちます。熱いままスプレーすると洗剤が飛び散り危険です。</p></div></li>
+    <li><div><b>パンレール・ファンカバーを外し、固形物を取る</b><p>落ちた食材くずを拾い、排水口のフィルターを掃除します。ここを怠ると排水が詰まります。</p></div></li>
+    <li><div><b>専用洗剤をスプレーする</b><p>スプレーガンで庫内全体、扉の内側、ファン周りにまんべんなく。ゴム手袋と保護メガネを着用します。</p></div></li>
+    <li><div><b>スチームで約10分運転する</b><p>扉を閉め、スチームモード（または洗浄モード）で約10分。洗剤が汚れを浮かせます。自動洗浄機能がある場合は、洗剤を投入して洗浄モードをスタートすれば、洗浄・すすぎ・乾燥まで自動です。汚れの度合いに応じて3段階から選びます。</p></div></li>
+    <li><div><b>ハンドシャワーですすぐ</b><p>庫内の洗浄シャワーで洗剤が残らないように上から下へ流します。洗剤残りは翌朝の食材ににおいが移り、庫内の腐食も招きます。</p></div></li>
+    <li><div><b>パッキン・扉のガラス・芯温センサーを拭く</b><p>パッキンは中性洗剤を含ませた布で拭き、しっかり水拭き。芯温センサーも同様に拭きます。</p></div></li>
+    <li><div><b>外装を拭く</b><p>中性洗剤を溶かした布で汚れを拭き、よく絞った布で洗剤分を完全に拭き取ります。パネルは乾いた柔らかい布で。</p></div></li>
+    <li><div><b>扉を少し開けて乾燥させ、電源とガスを切る</b><p>扉を閉めきると庫内に湿気がこもり、においとカビの原因になります。</p></div></li>
+  </ol>
+
+  <h3>週に1回</h3>
+  <ul class="plain">
+    <li>ファンカバーの奥、ファン本体の汚れを確認し、こびりつきがあれば洗剤を長めに置いて落とす。</li>
+    <li>扉のパッキンの全周を点検。ひび割れ・硬化があれば交換を手配。</li>
+    <li>排水管の流れを確認。流れが遅ければ排水口を分解清掃。</li>
+    <li>庫内灯のカバー、パンレールの固定を確認。</li>
+  </ul>
+
+  <h3>月に1回・定期</h3>
+  <ul class="plain">
+    <li>軟水器の再生（塩の補充）またはカートリッジ交換。交換日を記録表に記入する。スケールが蒸気発生装置につくと、蒸気が出ない・排水ポンプが詰まるといった修理につながります。</li>
+    <li>ガス接続部（ゴム管・可とう管）のひび割れ、ガス漏れ検知液での確認。</li>
+    <li>年1回はメーカーまたは販売店の保守点検を受けることをおすすめします。</li>
+  </ul>
+</section>
+
+<!-- ===== 10 ===== -->
+<section id="s10">
+  <div class="sec-head"><span class="num">10</span><h2>困ったとき</h2><span class="en">TROUBLESHOOTING</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>症状</th><th>まず確認すること</th><th>それでも直らないとき</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>電源が入らない</td>
+          <td>電源プラグ、厨房の分電盤ブレーカー。</td>
+          <td>機器責任者へ。無理に再投入しない。</td>
+        </tr>
+        <tr>
+          <td>点火しない・すぐ消える</td>
+          <td>ガス元栓、他のガス機器が使えるか。1分以上待って換気し、再度スタート。立消え安全装置が働いている場合があります。</td>
+          <td>2回で点火しなければ中止し、ガス会社または販売店へ。何度も繰り返さない。</td>
+        </tr>
+        <tr>
+          <td>蒸気が出ない・温度が上がらない</td>
+          <td>給水バルブ、断水、給水フィルターの詰まり。空焚き防止装置が働いていることがあります。</td>
+          <td>スケール詰まりの可能性。メンテナンスへ。</td>
+        </tr>
+        <tr>
+          <td>焼きムラがある</td>
+          <td>予熱不足、パンの詰め込みすぎ、ファンカバーの取り付け忘れ、扉の閉め忘れ。</td>
+          <td>ファンの異音があればモーター不良。メンテナンスへ。</td>
+        </tr>
+        <tr>
+          <td>扉から蒸気が漏れる</td>
+          <td>パッキンの汚れ・ずれ、扉のゆがみ、パンが飛び出していないか。</td>
+          <td>パッキン交換を手配。</td>
+        </tr>
+        <tr>
+          <td>床が濡れる・排水があふれる</td>
+          <td>排水口フィルターの詰まり、排水管の折れ。</td>
+          <td>排水ポンプ・ボールバルブの詰まり（スケール）の可能性。メンテナンスへ。</td>
+        </tr>
+        <tr>
+          <td>庫内がにおう</td>
+          <td>洗剤のすすぎ残し、排水口の汚れ、扉を閉めきったままの保管。</td>
+          <td>スチーム100℃で15分空運転し換気。改善しなければ分解清掃。</td>
+        </tr>
+        <tr>
+          <td>パネルにエラー番号が出る</td>
+          <td>番号と発生時の状況をメモし、いったん電源を切って1分後に入れ直す。</td>
+          <td>再発したら番号を伝えてメンテナンスへ。<b>自分で分解しない。</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>連絡先</h3>
+  <div class="contact">
+    <div>
+      <small>タニコー メンテナンスコールセンター（24時間365日受付）</small>
+      <b>044-872-8152</b>
+      <small style="margin-top:8px">連絡時に伝えること：型式 TGSC-10DCL ／ 製造番号 ／ エラー番号 ／ 発生時の操作 ／ 施設名と電話番号</small>
+    </div>
+    <div>
+      <small>販売店・ガス会社</small>
+      <span class="fill" style="min-width:14em"></span><br>
+      <small style="margin-top:8px">機器責任者</small>
+      <span class="fill" style="min-width:14em"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 11 ===== -->
+<section id="s11">
+  <div class="sec-head"><span class="num">11</span><h2>点検記録表</h2><span class="en">LOG</span></div>
+  <p class="prose">印刷して機器のそばに掲示し、始業点検と終業清掃を行った人がサインします。月末に機器責任者が回収し、1年間保管します。</p>
+  <p class="spec-note" style="margin-bottom:8px">　　　　年　　　月　／ 軟水器 前回交換・再生日：　　　　　　　　</p>
+  <div class="table-wrap">
+    <table class="log-table">
+      <thead>
+        <tr><th style="width:4em">日</th><th>始業点検<br><small>サイン</small></th><th>終業清掃<br><small>サイン</small></th><th>排水口<br><small>清掃</small></th><th>パッキン<br><small>確認</small></th><th style="width:30%">異常・気づいたこと</th><th>責任者<br><small>確認</small></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>7</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>8</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>9</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>10</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>11</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>12</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>13</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>14</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>15</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>16</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>17</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>18</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>19</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>20</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>21</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>22</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>23</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>24</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>25</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>26</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>27</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>28</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>29</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>30</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>31</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer class="doc-foot">
+  <p>本書は当館の運用のために作成した内部資料です。仕様値はタニコー株式会社の公開カタログおよび販売店の製品情報（TGSC-A10DC系）を参照しています。実機の銘板およびメーカー付属の取扱説明書の記載が優先します。</p>
+  <ul>
+    <li>タニコー株式会社「DXスチームコンベクションオーブン」カタログ、「スチームコンベクションオーブンの清掃方法」</li>
+    <li>各販売店の TGSC-A10DC(R/L) 製品仕様ページ</li>
+  </ul>
+</footer>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var KEY = 'tgsc10dcl-check-v1';
+  var boxes = document.querySelectorAll('#check-open input[type="checkbox"]');
+  function load() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+      var today = new Date().toDateString();
+      if (saved.date !== today) return;
+      boxes.forEach(function (b) { b.checked = !!saved[b.id]; });
+    } catch (e) {}
+  }
+  function save() {
+    try {
+      var data = { date: new Date().toDateString() };
+      boxes.forEach(function (b) { data[b.id] = b.checked; });
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+  boxes.forEach(function (b) { b.addEventListener('change', save); });
+  var reset = document.getElementById('ck-reset');
+  if (reset) reset.addEventListener('click', function () {
+    boxes.forEach(function (b) { b.checked = false; });
+    save();
+  });
+  var pr = document.getElementById('btn-print');
+  if (pr) pr.addEventListener('click', function () { window.print(); });
+  load();
+})();
+</script>
+
+</body>
+</html>
